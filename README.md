@@ -1,2 +1,2 @@
 # garantia360
-Prototipo ODR Garantía360
+index.html
