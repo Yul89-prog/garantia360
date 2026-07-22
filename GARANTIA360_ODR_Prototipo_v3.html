@@ -1,0 +1,1524 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GARANTÍA360 ODR — Prototipo Interactivo</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --blue:#0052CC;--blue-l:#EBF2FF;--blue-m:#4F9DFF;
+  --green:#22C55E;--green-l:#DCFCE7;
+  --amber:#F59E0B;--amber-l:#FEF3C7;
+  --red:#EF4444;--red-l:#FEE2E2;
+  --purple:#7C3AED;--purple-l:#F3E8FF;
+  --teal:#0891B2;--teal-l:#E0F2FE;
+  --gray:#F5F7FA;--border:#E5E7EB;
+  --text:#1F2937;--text2:#6B7280;--text3:#9CA3AF;--white:#fff;
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0A0F1E;color:var(--text);font-size:14px;line-height:1.5;min-height:100vh}
+
+/* ======= LANDING / SELECTOR ======= */
+.landing{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;background:linear-gradient(135deg,#0A0F1E 0%,#0D1B3E 50%,#0A0F1E 100%)}
+.landing-logo{text-align:center;margin-bottom:40px}
+.landing-icon{width:72px;height:72px;background:var(--blue);border-radius:20px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;box-shadow:0 0 60px rgba(0,82,204,.4)}
+.landing-icon svg{width:40px;height:40px;stroke:#fff;fill:none;stroke-width:2}
+.landing-title{font-size:36px;font-weight:900;color:#fff;letter-spacing:-.02em}
+.landing-sub{font-size:14px;color:rgba(255,255,255,.5);letter-spacing:.15em;font-weight:600;margin-top:4px}
+.landing-desc{font-size:15px;color:rgba(255,255,255,.6);text-align:center;max-width:500px;margin:0 auto 48px;line-height:1.7}
+.view-selector{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;width:100%;max-width:780px;margin-bottom:24px}
+.view-card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:28px 20px;text-align:center;cursor:pointer;transition:all .2s}
+.view-card:hover{background:rgba(255,255,255,.1);border-color:rgba(79,157,255,.5);transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,0,0,.3)}
+.view-card .vc-icon{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 14px}
+.view-card .vc-icon svg{width:26px;height:26px;fill:none;stroke:#fff;stroke-width:2}
+.view-card .vc-title{font-size:15px;font-weight:700;color:#fff;margin-bottom:6px}
+.view-card .vc-desc{font-size:12px;color:rgba(255,255,255,.5);line-height:1.5}
+.view-card .vc-tag{display:inline-flex;align-items:center;margin-top:12px;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700}
+.also-row{display:flex;gap:10px;width:100%;max-width:780px;flex-wrap:wrap;justify-content:center}
+.also-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:14px 20px;cursor:pointer;text-align:center;transition:all .2s;flex:1;min-width:160px}
+.also-card:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.15)}
+.also-card .at{font-size:12px;font-weight:700;color:#fff;margin-bottom:3px}
+.also-card .as{font-size:11px;color:rgba(255,255,255,.4)}
+.version-badge{margin-top:32px;font-size:11px;color:rgba(255,255,255,.25)}
+
+/* ======= APP SHELL ======= */
+.app-shell{display:none;height:100vh;flex-direction:column;overflow:hidden}
+.app-shell.on{display:flex}
+
+/* TOP ROLE BAR */
+.role-bar{height:36px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;flex-shrink:0;font-size:11px;font-weight:600}
+.role-bar.consumer{background:#0047B3;color:#fff}
+.role-bar.taller{background:#92400E;color:#fff}
+.role-bar.marca{background:#0A1628;color:rgba(255,255,255,.7)}
+.rb-left{display:flex;align-items:center;gap:8px}
+.rb-left svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2}
+.rb-back{cursor:pointer;display:flex;align-items:center;gap:4px;opacity:.7;transition:opacity .15s}
+.rb-back:hover{opacity:1}
+
+/* MAIN LAYOUT */
+.main-layout{flex:1;display:flex;overflow:hidden}
+
+/* SIDEBAR */
+.sidebar{width:230px;display:flex;flex-direction:column;flex-shrink:0}
+.sidebar.consumer{background:#fff;border-right:1px solid var(--border)}
+.sidebar.taller{background:#fff;border-right:1px solid var(--border)}
+.sidebar.marca{background:#0A1628}
+.sh{padding:16px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+.sidebar.marca .sh{border-bottom-color:rgba(255,255,255,.1)}
+.li{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.li svg{width:16px;height:16px;stroke:#fff;fill:none;stroke-width:2}
+.lt{font-size:13px;font-weight:800}
+.ls{font-size:9px;letter-spacing:.08em;font-weight:600}
+.role-pill{margin:6px 10px 8px;padding:5px 10px;border-radius:7px;display:flex;align-items:center;gap:6px}
+.role-pill svg{width:12px;height:12px;fill:none;stroke-width:2;stroke:currentColor}
+.role-pill span{font-size:11px;font-weight:700}
+.snav{flex:1;padding:8px;overflow-y:auto}
+.slbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;padding:0 6px;margin:12px 0 4px}
+.ni{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:7px;cursor:pointer;font-size:12px;font-weight:500;position:relative;transition:all .12s}
+.ni svg{width:14px;height:14px;flex-shrink:0;stroke:currentColor;fill:none;stroke-width:2}
+.nb{margin-left:auto;font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px;color:#fff}
+.nb.r{background:var(--red)}
+.sf{padding:10px 12px;display:flex;align-items:center;gap:8px}
+.sidebar.consumer .sf,.sidebar.taller .sf{border-top:1px solid var(--border)}
+.sidebar.marca .sf{border-top:1px solid rgba(255,255,255,.1)}
+
+/* CONSUMER SIDEBAR */
+.sidebar.consumer .slbl{color:var(--text3)}
+.sidebar.consumer .ni{color:var(--text2)}
+.sidebar.consumer .ni:hover{background:#F3F4F6;color:var(--text)}
+.sidebar.consumer .ni.on{background:var(--blue-l);color:var(--blue)}
+.sidebar.consumer .nb{background:var(--blue)}
+.sidebar.consumer .lt{color:var(--blue)}
+.sidebar.consumer .ls{color:var(--text2)}
+.sidebar.consumer .li{background:var(--blue)}
+.sidebar.consumer .uname{font-size:12px;font-weight:600;color:var(--text)}
+.sidebar.consumer .urole{font-size:10px;color:var(--text2)}
+.sidebar.consumer .role-pill{background:var(--blue-l);border:1px solid #BFDBFE}
+.sidebar.consumer .role-pill svg,.sidebar.consumer .role-pill span{color:var(--blue)}
+
+/* TALLER SIDEBAR */
+.sidebar.taller .slbl{color:var(--text3)}
+.sidebar.taller .ni{color:var(--text2)}
+.sidebar.taller .ni:hover{background:#F3F4F6;color:var(--text)}
+.sidebar.taller .ni.on{background:var(--amber-l);color:#92400E}
+.sidebar.taller .nb{background:var(--amber)}
+.sidebar.taller .lt{color:#92400E}
+.sidebar.taller .ls{color:var(--text2)}
+.sidebar.taller .li{background:var(--amber)}
+.sidebar.taller .uname{font-size:12px;font-weight:600;color:var(--text)}
+.sidebar.taller .urole{font-size:10px;color:var(--text2)}
+.sidebar.taller .role-pill{background:var(--amber-l);border:1px solid #FDE68A}
+.sidebar.taller .role-pill svg,.sidebar.taller .role-pill span{color:#92400E}
+
+/* MARCA SIDEBAR */
+.sidebar.marca .slbl{color:rgba(255,255,255,.3)}
+.sidebar.marca .ni{color:rgba(255,255,255,.55)}
+.sidebar.marca .ni:hover{background:rgba(255,255,255,.08);color:#fff}
+.sidebar.marca .ni.on{background:rgba(0,82,204,.5);color:#fff}
+.sidebar.marca .nb{background:var(--red)}
+.sidebar.marca .lt{color:#fff}
+.sidebar.marca .ls{color:rgba(255,255,255,.4)}
+.sidebar.marca .li{background:var(--blue)}
+.sidebar.marca .uname{font-size:12px;font-weight:600;color:#fff}
+.sidebar.marca .urole{font-size:10px;color:rgba(255,255,255,.5)}
+.sidebar.marca .role-pill{background:rgba(0,82,204,.3);border:1px solid rgba(79,157,255,.3)}
+.sidebar.marca .role-pill svg,.sidebar.marca .role-pill span{color:#4F9DFF}
+
+/* MAIN CONTENT AREA */
+.content-area{flex:1;display:flex;flex-direction:column;overflow:hidden;background:#F0F2F5}
+.topbar{height:52px;background:#fff;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:14px;flex-shrink:0}
+.bc{flex:1;font-size:12px;color:var(--text2)}
+.bc .cur{color:var(--text);font-weight:600}
+.ta{display:flex;align-items:center;gap:8px}
+.sb-search{display:flex;align-items:center;gap:6px;background:var(--gray);border:1px solid var(--border);border-radius:7px;padding:6px 10px;width:180px}
+.sb-search svg{width:12px;height:12px;stroke:var(--text3);fill:none;stroke-width:2}
+.sb-search input{border:none;background:transparent;font-size:12px;outline:none;flex:1;color:var(--text)}
+.content-scroll{flex:1;overflow-y:auto;padding:20px}
+
+/* PAGES */
+.page{display:none}
+.page.on{display:block}
+
+/* COMMON COMPONENTS */
+.btn{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid transparent;transition:all .15s;white-space:nowrap}
+.btn svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2}
+.btn-p{background:var(--blue);color:#fff;border-color:var(--blue)}
+.btn-p:hover{background:#0047B3}
+.btn-p svg{stroke:#fff}
+.btn-s{background:#fff;color:var(--text);border-color:var(--border)}
+.btn-s:hover{background:var(--gray)}
+.btn-g{background:transparent;color:var(--text2);border-color:transparent}
+.btn-g:hover{background:var(--gray);color:var(--text)}
+.btn-suc{background:var(--green);color:#fff;border-color:var(--green)}
+.btn-suc svg{stroke:#fff}
+.btn-err{background:var(--red);color:#fff;border-color:var(--red)}
+.btn-am{background:var(--amber);color:#fff;border-color:var(--amber)}
+.btn-sm{padding:4px 10px;font-size:11px}
+.ibtn{width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text2);position:relative;transition:all .15s}
+.ibtn:hover{background:var(--gray)}
+.ibtn svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2}
+.ndot{width:7px;height:7px;background:var(--red);border-radius:50%;position:absolute;top:3px;right:3px;border:1.5px solid #fff}
+.bdg{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700}
+.b-bl{background:var(--blue-l);color:var(--blue)}
+.b-gr{background:var(--green-l);color:#15803D}
+.b-am{background:var(--amber-l);color:#92400E}
+.b-rd{background:var(--red-l);color:#B91C1C}
+.b-gy{background:var(--gray);color:var(--text2)}
+.b-pu{background:var(--purple-l);color:var(--purple)}
+.card{background:#fff;border-radius:12px;border:1px solid var(--border)}
+.card-p{padding:16px}
+.card-h{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.card-t{font-size:13px;font-weight:700}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:18px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px}
+.g21{display:grid;grid-template-columns:1fr 300px;gap:16px;align-items:start}
+.mc{background:#fff;border-radius:12px;border:1px solid var(--border);padding:16px}
+.ml{font-size:11px;color:var(--text2);font-weight:500;margin-bottom:7px}
+.mv{font-size:26px;font-weight:800;line-height:1}
+.mch{font-size:11px;margin-top:5px}
+.up{color:var(--green)}
+.dn{color:var(--red)}
+.pb{height:5px;background:#E5E7EB;border-radius:3px;overflow:hidden;margin-top:8px}
+.pf{height:100%;border-radius:3px}
+.pbl{background:var(--blue)}
+.pgr{background:var(--green)}
+.pam{background:var(--amber)}
+.prd{background:var(--red)}
+.ptl{background:var(--teal)}
+.tbl{width:100%;border-collapse:collapse}
+.tbl th{padding:9px 14px;font-size:10px;font-weight:700;color:var(--text2);text-align:left;border-bottom:1px solid var(--border);background:var(--gray);text-transform:uppercase;letter-spacing:.04em}
+.tbl td{padding:11px 14px;border-bottom:1px solid var(--border);font-size:12px}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:#FAFAFA;cursor:pointer}
+.tl{display:flex;flex-direction:column}
+.tli{display:flex;gap:12px;position:relative}
+.tli:not(:last-child)::after{content:'';position:absolute;left:14px;top:29px;bottom:0;width:1px;background:var(--border)}
+.tld{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;z-index:1}
+.tld svg{width:12px;height:12px;stroke-width:2;stroke:currentColor;fill:none}
+.tld.bl{background:var(--blue-l)}
+.tld.bl svg{stroke:var(--blue)}
+.tld.gr{background:var(--green-l)}
+.tld.gr svg{stroke:#15803D}
+.tld.am{background:var(--amber-l)}
+.tld.am svg{stroke:#92400E}
+.tld.rd{background:var(--red-l)}
+.tld.rd svg{stroke:#B91C1C}
+.tld.gy{background:var(--gray)}
+.tld.gy svg{stroke:var(--text2)}
+.tlb{flex:1;padding-bottom:14px}
+.tlt{font-size:12px;font-weight:700;margin-bottom:2px}
+.tld2{font-size:11px;color:var(--text2);line-height:1.4}
+.tltm{font-size:10px;color:var(--text3);margin-top:3px}
+.ph{margin-bottom:20px}
+.pt{font-size:19px;font-weight:800;margin-bottom:3px}
+.ps{font-size:12px;color:var(--text2)}
+.lbl{display:block;font-size:10px;font-weight:700;color:var(--text2);margin-bottom:5px;text-transform:uppercase;letter-spacing:.04em}
+.inp{width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;color:var(--text);background:#fff;outline:none;font-family:inherit;transition:border-color .15s}
+.inp:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(0,82,204,.08)}
+.frow{display:grid;gap:12px;margin-bottom:12px}
+.c2{grid-template-columns:1fr 1fr}
+.c3{grid-template-columns:1fr 1fr 1fr}
+.iro{display:flex;align-items:center;justify-content:space-between;padding:7px 0;font-size:12px}
+.iro+.iro{border-top:1px solid var(--border)}
+.il{color:var(--text2);font-size:11px}
+.iv{font-weight:600}
+.divider{height:1px;background:var(--border);margin:14px 0}
+.av{border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0}
+.av32{width:32px;height:32px;font-size:11px}
+.av26{width:26px;height:26px;font-size:9px}
+.a-bl{background:var(--blue-l);color:var(--blue)}
+.a-am{background:var(--amber-l);color:#92400E}
+.a-gr{background:var(--green-l);color:#15803D}
+.a-pu{background:var(--purple-l);color:var(--purple)}
+.a-wh{background:var(--blue);color:#fff}
+.upload-zone{border:2px dashed var(--border);border-radius:10px;padding:22px;text-align:center;cursor:pointer;background:var(--gray);transition:all .15s}
+.upload-zone:hover{border-color:var(--blue);background:var(--blue-l)}
+.upload-zone svg{width:26px;height:26px;stroke:var(--text3);fill:none;stroke-width:2;margin:0 auto 7px}
+.fc{display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--gray);border:1px solid var(--border);border-radius:8px;margin-bottom:7px}
+.fc svg{width:14px;height:14px;fill:none;stroke-width:2}
+.fn{font-size:11px;font-weight:600;flex:1}
+.fs{font-size:10px;color:var(--text2)}
+.sign-box{border:2px dashed var(--border);border-radius:10px;height:100px;display:flex;align-items:center;justify-content:center;cursor:pointer;background:var(--gray);transition:all .2s}
+.sign-box:hover{border-color:var(--blue);background:var(--blue-l)}
+.sign-box.signed{border-color:var(--green);background:var(--green-l);border-style:solid}
+.stars{display:flex;gap:7px;margin:10px 0}
+.star{font-size:24px;cursor:pointer;color:#D1D5DB;transition:color .12s}
+.star.on{color:var(--amber)}
+.tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:16px}
+.tab{padding:9px 16px;font-size:12px;font-weight:600;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;transition:all .12s}
+.tab:hover{color:var(--text)}
+.tab.on{color:var(--blue);border-bottom-color:var(--blue)}
+.step-row{display:flex;align-items:center;margin-bottom:24px}
+.sc{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;border:2px solid var(--border);background:#fff;color:var(--text2)}
+.sc.on{border-color:var(--blue);background:var(--blue);color:#fff}
+.sc.dn{border-color:var(--green);background:var(--green);color:#fff}
+.sl{font-size:11px;font-weight:500;color:var(--text2);margin-left:7px;white-space:nowrap}
+.sl.on{color:var(--blue);font-weight:700}
+.sl.dn{color:#15803D}
+.sline{flex:1;height:1.5px;background:var(--border);margin:0 7px}
+.sline.dn{background:var(--green)}
+.vc{background:#fff;border:1px solid var(--border);border-radius:10px;padding:13px;display:flex;gap:10px;align-items:center;cursor:pointer;transition:all .12s;margin-bottom:8px}
+.vc:hover,.vc.on{border-color:var(--blue)}
+.vc.on{background:var(--blue-l)}
+.vi{width:40px;height:40px;background:var(--gray);border-radius:8px;display:flex;align-items:center;justify-content:center}
+.vi svg{width:22px;height:22px;stroke:var(--text2);fill:none;stroke-width:2}
+.vc.on .vi{background:var(--blue-l)}
+.vc.on .vi svg{stroke:var(--blue)}
+.vm{font-size:13px;font-weight:700}
+.vvn{font-size:10px;color:var(--text3);font-family:monospace}
+.vk{font-size:11px;color:var(--text2);margin-top:2px}
+.mbar{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.mbt{flex:1;height:4px;background:#E5E7EB;border-radius:2px;overflow:hidden}
+.mbf{height:100%;border-radius:2px}
+.mbv{font-size:11px;font-weight:600;width:32px;text-align:right}
+.krow{display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border)}
+.krow:last-child{border-bottom:none}
+.kn{font-size:11px;color:var(--text2)}
+.kv{font-size:13px;font-weight:700}
+
+/* CHAT */
+.chat-wrap{display:grid;grid-template-columns:240px 1fr;gap:14px;height:440px}
+.clist{background:#fff;border-radius:10px;border:1px solid var(--border);overflow:hidden;display:flex;flex-direction:column}
+.ci{padding:10px 12px;border-bottom:1px solid var(--border);cursor:pointer;display:flex;gap:8px;align-items:center;transition:all .12s}
+.ci:hover,.ci.on{background:var(--blue-l)}
+.ci-name{font-size:12px;font-weight:600}
+.ci-sub{font-size:10px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cmain{background:#fff;border-radius:10px;border:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
+.chead{padding:10px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;background:#fff}
+.msgs{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px;background:var(--gray)}
+.msg{display:flex;gap:7px;max-width:80%}
+.msg.me{align-self:flex-end;flex-direction:row-reverse}
+.mb2{padding:9px 13px;border-radius:12px;font-size:12px;line-height:1.5}
+.msg.ot .mb2{background:#fff;border:1px solid var(--border);border-bottom-left-radius:3px}
+.msg.me .mb2{background:var(--blue);color:#fff;border-bottom-right-radius:3px}
+.mm{font-size:10px;color:var(--text3);margin-top:2px}
+.msg.me .mm{text-align:right}
+.cinput{padding:9px 12px;border-top:1px solid var(--border);display:flex;align-items:center;gap:8px;background:#fff}
+.cinput input{flex:1;border:1px solid var(--border);border-radius:18px;padding:7px 13px;font-size:12px;outline:none;font-family:inherit}
+.csend{width:32px;height:32px;border-radius:50%;background:var(--blue);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+.csend svg{width:13px;height:13px;stroke:#fff;fill:none;stroke-width:2}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:200;opacity:0;pointer-events:none;transition:opacity .2s}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal{background:#fff;border-radius:14px;width:500px;max-width:90vw;box-shadow:0 24px 64px rgba(0,0,0,.2);transform:scale(.95);transition:transform .2s}
+.modal-overlay.open .modal{transform:scale(1)}
+.mh{padding:18px 22px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.mt{font-size:15px;font-weight:700}
+.mb-body{padding:18px 22px}
+.mf{padding:14px 22px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px}
+.xbtn{width:26px;height:26px;border:none;background:var(--gray);border-radius:6px;cursor:pointer;font-size:18px;color:var(--text2);line-height:1;display:flex;align-items:center;justify-content:center}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--text);color:#fff;padding:11px 18px;border-radius:10px;font-size:12px;font-weight:600;display:flex;align-items:center;gap:8px;z-index:300;transform:translateY(70px);opacity:0;transition:all .28s;max-width:320px;box-shadow:0 8px 32px rgba(0,0,0,.2)}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.suc{background:#15803D}
+.toast.err{background:#B91C1C}
+.toast svg{width:14px;height:14px;stroke:#fff;fill:none;stroke-width:2;flex-shrink:0}
+
+/* CASE CARDS */
+.case-card{background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px;cursor:pointer;transition:all .15s}
+.case-card:hover{border-color:var(--blue);box-shadow:0 2px 12px rgba(0,0,0,.06)}
+.case-card.urg{border-left:3px solid var(--red)}
+.case-card.norm{border-left:3px solid var(--amber)}
+.case-card.low{border-left:3px solid var(--green)}
+.sla-bar{height:6px;background:#E5E7EB;border-radius:3px;overflow:hidden;margin-top:4px}
+
+/* MAP PLACEHOLDER */
+.map-ph{background:linear-gradient(135deg,var(--blue-l),var(--teal-l));border-radius:8px;height:150px;display:flex;align-items:center;justify-content:center;border:1px solid var(--border);position:relative;overflow:hidden}
+.map-dot{position:absolute;width:10px;height:10px;border-radius:50%;border:2px solid #fff}
+
+/* SPARK */
+.spark{display:flex;align-items:flex-end;gap:2px;height:22px}
+.bar-s{width:5px;border-radius:2px 2px 0 0}
+</style>
+</head>
+<body>
+
+<!-- ======= LANDING ======= -->
+<div class="landing" id="landing">
+  <div class="landing-logo">
+    <div class="landing-icon">
+      <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
+    </div>
+    <div class="landing-title">GARANTÍA360</div>
+    <div class="landing-sub">ODR PLATFORM</div>
+  </div>
+  <p class="landing-desc">Plataforma de Resolución en Línea de Controversias para el sector automotriz. Selecciona el rol para explorar el prototipo interactivo.</p>
+  <div class="view-selector">
+    <div class="view-card" onclick="launchApp('consumer')">
+      <div class="vc-icon" style="background:var(--blue)"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg></div>
+      <div class="vc-title">Consumidor</div>
+      <div class="vc-desc">Propietario del vehículo. Registra solicitudes, da seguimiento, chatea y firma acuerdos.</div>
+      <div class="vc-tag" style="background:var(--blue-l);color:var(--blue)">Vista Cliente</div>
+    </div>
+    <div class="view-card" onclick="launchApp('taller')">
+      <div class="vc-icon" style="background:#92400E"><svg viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></div>
+      <div class="vc-title">Técnico / Taller</div>
+      <div class="vc-desc">Concesionario y taller autorizado. Gestiona diagnósticos, cotizaciones y comunicación.</div>
+      <div class="vc-tag" style="background:var(--amber-l);color:#92400E">Vista Taller</div>
+    </div>
+    <div class="view-card" onclick="launchApp('marca')">
+      <div class="vc-icon" style="background:var(--blue)"><svg viewBox="0 0 24 24"><path d="M3 21h18M3 7v14M21 7v14M9 21v-6h6v6M3 7l9-4 9 4"/></svg></div>
+      <div class="vc-title">Marca / Fabricante</div>
+      <div class="vc-desc">Ensambladora e importadora. Dashboard global, aprobaciones, campañas y reportes ejecutivos.</div>
+      <div class="vc-tag" style="background:var(--blue-l);color:var(--blue)">Vista Ejecutiva</div>
+    </div>
+  </div>
+  <div class="also-row">
+    <div class="also-card" onclick="launchSpecial('registro')">
+      <div class="at">📋 Registro de Vehículo</div>
+      <div class="as">Wizard de 5 pasos con validación VIN</div>
+    </div>
+    <div class="also-card" onclick="launchSpecial('casos')">
+      <div class="at">📖 Casos de Uso</div>
+      <div class="as">7 escenarios completos navegables</div>
+    </div>
+    <div class="also-card" onclick="launchSpecial('mobile')">
+      <div class="at">📱 Versión Móvil</div>
+      <div class="as">iOS / Android — 4 pantallas</div>
+    </div>
+  </div>
+  <div class="version-badge">GARANTÍA360 ODR v1.0 · Prototipo Alta Fidelidad · 2025</div>
+</div>
+
+<!-- ======= APP SHELL: CONSUMER ======= -->
+<div class="app-shell" id="app-consumer">
+  <div class="role-bar consumer">
+    <div class="rb-left">
+      <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
+      GARANTÍA360 — Vista Consumidor
+    </div>
+    <div class="rb-back" onclick="backToLanding()">
+      <svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Cambiar rol
+    </div>
+  </div>
+  <div class="main-layout">
+    <aside class="sidebar consumer">
+      <div class="sh">
+        <div class="li"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg></div>
+        <div><div class="lt">GARANTÍA360</div><div class="ls">ODR PLATFORM</div></div>
+      </div>
+      <div class="role-pill"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg><span>Consumidor</span></div>
+      <nav class="snav">
+        <div class="slbl">Principal</div>
+        <div class="ni on" data-page="c-dashboard" onclick="navC('c-dashboard',this)"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard</div>
+        <div class="ni" data-page="c-solicitudes" onclick="navC('c-solicitudes',this)"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>Solicitudes <span class="nb">7</span></div>
+        <div class="ni" data-page="c-nueva" onclick="navC('c-nueva',this)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>Nueva Solicitud</div>
+        <div class="ni" data-page="c-seguimiento" onclick="navC('c-seguimiento',this)"><svg viewBox="0 0 24 24"><polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/></svg>Seguimiento <span class="nb r">2</span></div>
+        <div class="slbl">Comunicación</div>
+        <div class="ni" data-page="c-chat" onclick="navC('c-chat',this)"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Chat <span class="nb">3</span></div>
+        <div class="ni" data-page="c-resolucion" onclick="navC('c-resolucion',this)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9 11l3 3L22 4"/></svg>Resolución</div>
+        <div class="slbl">Gestión</div>
+        <div class="ni" data-page="c-vehiculos" onclick="navC('c-vehiculos',this)"><svg viewBox="0 0 24 24"><path d="M5 17H3a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v9a2 2 0 0 1-2 2h-2"/><circle cx="7.5" cy="17.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>Mis Vehículos</div>
+        <div class="ni" data-page="c-historial" onclick="navC('c-historial',this)"><svg viewBox="0 0 24 24"><path d="M3 3h18v18H3z"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>Historial</div>
+        <div class="ni" data-page="c-perfil" onclick="navC('c-perfil',this)"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Mi Perfil</div>
+      </nav>
+      <div class="sf">
+        <div class="av av32 a-bl">CM</div>
+        <div><div class="uname">Carlos Mendoza</div><div class="urole">Consumidor</div></div>
+      </div>
+    </aside>
+    <div class="content-area">
+      <div class="topbar">
+        <div class="bc">GARANTÍA360 › <span class="cur" id="bc-c">Dashboard</span></div>
+        <div class="ta">
+          <div class="sb-search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input type="text" placeholder="Buscar..."></div>
+          <div class="ibtn" onclick="showToast('3 notificaciones pendientes','')"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span class="ndot"></span></div>
+          <button class="btn btn-p btn-sm" onclick="navC('c-nueva',document.querySelector('[data-page=c-nueva]'))"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Nueva Solicitud</button>
+        </div>
+      </div>
+      <div class="content-scroll">
+
+        <!-- CONSUMER DASHBOARD -->
+        <div class="page on" id="pg-c-dashboard">
+          <div class="ph"><div class="pt">Dashboard Ejecutivo</div><div class="ps">Resumen general — Julio 2025</div></div>
+          <div class="g4">
+            <div class="mc"><div class="ml">Solicitudes abiertas</div><div class="mv">47</div><div class="mch up">↑ 12% vs mes anterior</div><div class="pb"><div class="pf pbl" style="width:68%"></div></div></div>
+            <div class="mc"><div class="ml">Garantías aprobadas</div><div class="mv" style="color:var(--green)">31</div><div class="mch up">↑ 8% resolución rápida</div><div class="pb"><div class="pf pgr" style="width:82%"></div></div></div>
+            <div class="mc"><div class="ml">Rechazadas</div><div class="mv" style="color:var(--red)">9</div><div class="mch dn">↓ 3% vs mes anterior</div><div class="pb"><div class="pf prd" style="width:19%"></div></div></div>
+            <div class="mc"><div class="ml">Tiempo promedio</div><div class="mv">4.2 <span style="font-size:13px;color:var(--text2)">días</span></div><div class="mch up">↓ 1.3 días</div><div class="pb"><div class="pf pam" style="width:42%"></div></div></div>
+          </div>
+          <div class="g2">
+            <div class="card">
+              <div class="card-h"><div class="card-t">Solicitudes recientes</div><button class="btn btn-g btn-sm" onclick="navC('c-solicitudes',document.querySelector('[data-page=c-solicitudes]'))">Ver todas →</button></div>
+              <table class="tbl"><thead><tr><th>ID</th><th>Vehículo</th><th>Motivo</th><th>Estado</th></tr></thead><tbody>
+                <tr onclick="navC('c-seguimiento',document.querySelector('[data-page=c-seguimiento]'))"><td><b style="color:var(--blue);font-family:monospace">#GR-2471</b></td><td>Nissan Sentra 23</td><td>Falla motor</td><td><span class="bdg b-am">En revisión</span></td></tr>
+                <tr><td><b style="color:var(--blue);font-family:monospace">#GR-2468</b></td><td>Toyota Corolla 22</td><td>Frenos</td><td><span class="bdg b-bl">Asignada</span></td></tr>
+                <tr><td><b style="color:var(--blue);font-family:monospace">#GR-2460</b></td><td>Ford Explorer 24</td><td>Transmisión</td><td><span class="bdg b-gr">Resuelta</span></td></tr>
+                <tr><td><b style="color:var(--blue);font-family:monospace">#GR-2455</b></td><td>Chevrolet Equinox</td><td>Eléctrico</td><td><span class="bdg b-rd">Rechazada</span></td></tr>
+              </tbody></table>
+            </div>
+            <div class="card">
+              <div class="card-h"><div class="card-t">Actividad reciente</div></div>
+              <div class="card-p">
+                <div class="tl">
+                  <div class="tli"><div class="tld gr"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/></svg></div><div class="tlb"><div class="tlt">Garantía #GR-2460 aprobada</div><div class="tld2">Ford Explorer — Transmisión reemplazada</div><div class="tltm">Hace 2 horas</div></div></div>
+                  <div class="tli"><div class="tld bl"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><div class="tlb"><div class="tlt">Nuevo mensaje — #GR-2471</div><div class="tld2">Taller Nissan envió diagnóstico actualizado</div><div class="tltm">Hace 5 horas</div></div></div>
+                  <div class="tli"><div class="tld am"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/></svg></div><div class="tlb"><div class="tlt">Escalamiento — #GR-2468</div><div class="tld2">Toyota Corolla requiere intervención marca</div><div class="tltm">Ayer, 14:30</div></div></div>
+                  <div class="tli"><div class="tld gy"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg></div><div class="tlb"><div class="tlt">Vehículo registrado</div><div class="tld2">Nissan Sentra 2023 — VIN registrado</div><div class="tltm">15 Jul 2025</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- NPS -->
+          <div class="card card-p" style="max-width:340px">
+            <div style="font-size:13px;font-weight:700;margin-bottom:12px">Satisfacción NPS</div>
+            <svg width="120" height="120" viewBox="0 0 120 120" style="display:block;margin:0 auto">
+              <circle cx="60" cy="60" r="48" fill="none" stroke="#E5E7EB" stroke-width="10"/>
+              <circle cx="60" cy="60" r="48" fill="none" stroke="#22C55E" stroke-width="10" stroke-dasharray="301 301" stroke-dashoffset="90" stroke-linecap="round" transform="rotate(-90 60 60)"/>
+              <text x="60" y="55" text-anchor="middle" font-size="22" font-weight="800" fill="#1F2937">87%</text>
+              <text x="60" y="71" text-anchor="middle" font-size="10" fill="#6B7280">NPS Score</text>
+            </svg>
+          </div>
+        </div>
+
+        <!-- SOLICITUDES -->
+        <div class="page" id="pg-c-solicitudes">
+          <div class="ph" style="display:flex;justify-content:space-between;align-items:center"><div><div class="pt">Mis Solicitudes</div><div class="ps">16 solicitudes totales</div></div><button class="btn btn-p" onclick="navC('c-nueva',document.querySelector('[data-page=c-nueva]'))"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Nueva Solicitud</button></div>
+          <div class="card">
+            <div class="card-h"><div style="font-size:12px;color:var(--text2)">16 registros</div><button class="btn btn-s btn-sm" onclick="showToast('Exportando CSV...','')">Exportar CSV</button></div>
+            <table class="tbl"><thead><tr><th>ID</th><th>Vehículo</th><th>Motivo</th><th>Taller</th><th>Fecha</th><th>Estado</th><th></th></tr></thead><tbody>
+              <tr onclick="navC('c-seguimiento',document.querySelector('[data-page=c-seguimiento]'))"><td><b style="color:var(--blue);font-family:monospace">#GR-2471</b></td><td>Nissan Sentra 2023</td><td>Falla motor</td><td>Nissan Satélite</td><td>10 Jul 25</td><td><span class="bdg b-am">En revisión</span></td><td><button class="btn btn-g btn-sm">Ver →</button></td></tr>
+              <tr><td><b style="color:var(--blue);font-family:monospace">#GR-2468</b></td><td>Toyota Corolla 2022</td><td>Frenos</td><td>Toyota Centro</td><td>8 Jul 25</td><td><span class="bdg b-bl">Asignada</span></td><td><button class="btn btn-g btn-sm">Ver →</button></td></tr>
+              <tr><td><b style="color:var(--blue);font-family:monospace">#GR-2460</b></td><td>Ford Explorer 2024</td><td>Transmisión</td><td>Ford Insurgentes</td><td>2 Jul 25</td><td><span class="bdg b-gr">Resuelta</span></td><td><button class="btn btn-g btn-sm">Ver →</button></td></tr>
+              <tr><td><b style="color:var(--blue);font-family:monospace">#GR-2455</b></td><td>Chevrolet Equinox</td><td>Eléctrico</td><td>Chevrolet Pedregal</td><td>28 Jun 25</td><td><span class="bdg b-rd">Rechazada</span></td><td><button class="btn btn-g btn-sm">Ver →</button></td></tr>
+              <tr><td><b style="color:var(--blue);font-family:monospace">#GR-2441</b></td><td>Nissan Sentra 2023</td><td>Aire acond.</td><td>Nissan Satélite</td><td>15 Jun 25</td><td><span class="bdg b-gr">Resuelta</span></td><td><button class="btn btn-g btn-sm">Ver →</button></td></tr>
+            </tbody></table>
+          </div>
+        </div>
+
+        <!-- NUEVA SOLICITUD -->
+        <div class="page" id="pg-c-nueva">
+          <div class="ph"><div class="pt">Nueva Solicitud de Garantía</div><div class="ps">Complete el formulario en 4 pasos</div></div>
+          <div class="step-row">
+            <div class="sc dn">✓</div><span class="sl dn">Vehículo</span>
+            <div class="sline dn"></div>
+            <div class="sc on">2</div><span class="sl on">Motivo</span>
+            <div class="sline"></div>
+            <div class="sc">3</div><span class="sl">Evidencia</span>
+            <div class="sline"></div>
+            <div class="sc">4</div><span class="sl">Confirmación</span>
+          </div>
+          <div class="g21">
+            <div>
+              <div class="card card-p" style="margin-bottom:14px">
+                <div style="font-size:13px;font-weight:700;margin-bottom:12px">Seleccionar vehículo</div>
+                <div class="vc on"><div class="vi"><svg viewBox="0 0 24 24"><path d="M5 17H3a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v9a2 2 0 0 1-2 2h-2"/><circle cx="7.5" cy="17.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg></div><div><div class="vm">Nissan Sentra 2023</div><div class="vvn">VIN: 3N1AB7AP9PY123456</div><div class="vk">48,200 km · Gris Plata</div></div><svg viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2" style="width:14px;margin-left:auto"><path d="M9 11l3 3L22 4"/></svg></div>
+                <div class="vc"><div class="vi"><svg viewBox="0 0 24 24"><path d="M5 17H3a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v9a2 2 0 0 1-2 2h-2"/><circle cx="7.5" cy="17.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg></div><div><div class="vm">Ford Explorer 2024</div><div class="vvn">VIN: 1FM5K8D89RGA23412</div><div class="vk">12,890 km · Negro</div></div></div>
+              </div>
+              <div class="card card-p">
+                <div style="font-size:13px;font-weight:700;margin-bottom:12px">Detalle de la solicitud</div>
+                <div class="frow c2"><div><label class="lbl">Categoría</label><select class="inp"><option>Motor y transmisión</option><option>Sistema eléctrico</option><option>Frenos</option><option>A/C</option></select></div><div><label class="lbl">Taller</label><select class="inp"><option>Nissan Satélite</option><option>Nissan Centro CDMX</option></select></div></div>
+                <div style="margin-bottom:12px"><label class="lbl">Descripción del problema</label><textarea class="inp" style="min-height:85px;resize:vertical">Vibración excesiva al arrancar en frío. Luz Check Engine encendida desde el 5 de julio. Falla intermitente al acelerar.</textarea></div>
+                <div class="frow c2"><div><label class="lbl">Fecha del incidente</label><input class="inp" value="05 Jul 2025"></div><div><label class="lbl">Kilometraje</label><input class="inp" type="number" value="48200"></div></div>
+                <div style="margin-bottom:12px"><label class="lbl">Evidencia adjunta</label>
+                  <div class="upload-zone" onclick="showToast('Seleccionar archivos','')"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17,8 12,3 7,8"/><line x1="12" y1="3" x2="12" y2="15"/></svg><div style="font-size:12px;color:var(--text2)">Arrastra o haz clic para adjuntar</div><div style="font-size:10px;color:var(--text3)">JPG, PNG, PDF, MP4 — Máx 25 MB</div></div>
+                  <div style="margin-top:8px">
+                    <div class="fc"><svg viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/></svg><span class="fn">foto_motor_check.jpg</span><span class="fs">2.4 MB</span></div>
+                    <div class="fc"><svg viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg><span class="fn">factura_nissan_2023.pdf</span><span class="fs">890 KB</span></div>
+                  </div>
+                </div>
+                <div style="display:flex;gap:10px;justify-content:flex-end"><button class="btn btn-s">Guardar borrador</button><button class="btn btn-p" onclick="openModal()">Enviar Solicitud <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button></div>
+              </div>
+            </div>
+            <div>
+              <div class="card card-p" style="margin-bottom:12px">
+                <div style="font-size:13px;font-weight:700;margin-bottom:10px">Información del vehículo</div>
+                <div class="iro"><span class="il">VIN</span><span class="iv" style="font-family:monospace;font-size:10px">3N1AB7AP9PY123456</span></div>
+                <div class="iro"><span class="il">Marca / Modelo</span><span class="iv">Nissan Sentra</span></div>
+                <div class="iro"><span class="il">Año</span><span class="iv">2023</span></div>
+                <div class="iro"><span class="il">Km actuales</span><span class="iv">48,200 km</span></div>
+                <div class="iro"><span class="il">Garantía hasta</span><span class="iv" style="color:var(--green)">Mar 2026 ✓</span></div>
+              </div>
+              <div class="card card-p" style="background:var(--amber-l);border-color:#FDE68A">
+                <div style="font-size:12px;font-weight:700;color:#92400E;margin-bottom:5px">⏱ Tiempo estimado</div>
+                <div style="font-size:11px;color:#B45309">3–5 días hábiles desde la asignación al taller.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SEGUIMIENTO -->
+        <div class="page" id="pg-c-seguimiento">
+          <div class="ph" style="display:flex;justify-content:space-between;align-items:flex-start">
+            <div><div style="display:flex;align-items:center;gap:10px;margin-bottom:3px"><div class="pt" style="margin:0">Solicitud #GR-2471</div><span class="bdg b-am">En revisión</span></div><div class="ps">Nissan Sentra 2023 — Falla en sistema de motor</div></div>
+            <div style="display:flex;gap:8px"><button class="btn btn-s btn-sm" onclick="navC('c-chat',document.querySelector('[data-page=c-chat]'))">Chat</button><button class="btn btn-s btn-sm" onclick="showToast('PDF generado','suc')">PDF</button></div>
+          </div>
+          <div class="g21">
+            <div>
+              <div class="card card-p" style="margin-bottom:14px">
+                <div style="font-size:13px;font-weight:700;margin-bottom:14px">Estado de la solicitud</div>
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+                  <div style="text-align:center"><div style="width:28px;height:28px;border-radius:50%;background:var(--green-l);display:flex;align-items:center;justify-content:center;margin:0 auto 4px"><svg viewBox="0 0 24 24" fill="none" stroke="#15803D" stroke-width="2" style="width:14px"><path d="M9 11l3 3L22 4"/></svg></div><div style="font-size:10px;color:#15803D;font-weight:600">Recibida</div></div>
+                  <div style="flex:1;height:2px;background:var(--green);margin:0 4px;margin-bottom:18px"></div>
+                  <div style="text-align:center"><div style="width:28px;height:28px;border-radius:50%;background:var(--green-l);display:flex;align-items:center;justify-content:center;margin:0 auto 4px"><svg viewBox="0 0 24 24" fill="none" stroke="#15803D" stroke-width="2" style="width:14px"><path d="M9 11l3 3L22 4"/></svg></div><div style="font-size:10px;color:#15803D;font-weight:600">Validada</div></div>
+                  <div style="flex:1;height:2px;background:var(--green);margin:0 4px;margin-bottom:18px"></div>
+                  <div style="text-align:center"><div style="width:28px;height:28px;border-radius:50%;background:var(--amber-l);border:2px solid var(--amber);display:flex;align-items:center;justify-content:center;margin:0 auto 4px"><svg viewBox="0 0 24 24" fill="none" stroke="var(--amber)" stroke-width="2" style="width:14px"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg></div><div style="font-size:10px;color:var(--amber);font-weight:700">Diagnóstico</div></div>
+                  <div style="flex:1;height:2px;background:var(--border);margin:0 4px;margin-bottom:18px"></div>
+                  <div style="text-align:center"><div style="width:28px;height:28px;border-radius:50%;background:var(--gray);display:flex;align-items:center;justify-content:center;margin:0 auto 4px"><svg viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="2" style="width:14px"><circle cx="12" cy="12" r="10"/></svg></div><div style="font-size:10px;color:var(--text3)">Resolución</div></div>
+                  <div style="flex:1;height:2px;background:var(--border);margin:0 4px;margin-bottom:18px"></div>
+                  <div style="text-align:center"><div style="width:28px;height:28px;border-radius:50%;background:var(--gray);display:flex;align-items:center;justify-content:center;margin:0 auto 4px"><svg viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="2" style="width:14px"><path d="M9 11l3 3L22 4"/></svg></div><div style="font-size:10px;color:var(--text3)">Cerrada</div></div>
+                </div>
+              </div>
+              <div class="card card-p">
+                <div style="font-size:13px;font-weight:700;margin-bottom:12px">Historial de actividad</div>
+                <div class="tl">
+                  <div class="tli"><div class="tld am"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/></svg></div><div class="tlb"><div class="tlt">Diagnóstico en proceso</div><div class="tld2">Técnico inició inspección del sistema de inyección</div><div class="tltm">Hoy, 09:15</div></div></div>
+                  <div class="tli"><div class="tld bl"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><div class="tlb"><div class="tlt">Mensaje del taller</div><div class="tld2">"Vehículo recibido, iniciamos revisión en 24 hrs"</div><div class="tltm">11 Jul, 11:30</div></div></div>
+                  <div class="tli"><div class="tld gr"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/></svg></div><div class="tlb"><div class="tlt">Solicitud validada</div><div class="tld2">Vehículo verificado dentro del período de garantía</div><div class="tltm">10 Jul, 08:02</div></div></div>
+                  <div class="tli"><div class="tld gy"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div><div class="tlb"><div class="tlt">Solicitud registrada</div><div class="tld2">Carlos Mendoza abrió el caso con 2 archivos</div><div class="tltm">10 Jul, 07:48</div></div></div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div class="card card-p" style="margin-bottom:12px">
+                <div style="font-size:13px;font-weight:700;margin-bottom:10px">Partes involucradas</div>
+                <div style="display:flex;flex-direction:column;gap:10px">
+                  <div style="display:flex;align-items:center;gap:9px"><div class="av av32 a-bl">CM</div><div><div style="font-size:12px;font-weight:600">Carlos Mendoza</div><div style="font-size:10px;color:var(--text2)">Propietario</div></div><span class="bdg b-bl" style="margin-left:auto">Tú</span></div>
+                  <div style="display:flex;align-items:center;gap:9px"><div class="av av32 a-am">RS</div><div><div style="font-size:12px;font-weight:600">Rodrigo Sánchez</div><div style="font-size:10px;color:var(--text2)">Técnico — Nissan Satélite</div></div><span style="width:8px;height:8px;background:var(--green);border-radius:50%;margin-left:auto"></span></div>
+                  <div style="display:flex;align-items:center;gap:9px"><div class="av av32 a-gr">NM</div><div><div style="font-size:12px;font-weight:600">Nissan México</div><div style="font-size:10px;color:var(--text2)">Fabricante</div></div></div>
+                </div>
+              </div>
+              <div class="card card-p" style="background:var(--blue-l);border-color:#BFDBFE">
+                <div style="font-size:12px;font-weight:700;color:var(--blue);margin-bottom:7px">¿Necesitas ayuda?</div>
+                <div style="font-size:11px;color:#1E40AF;margin-bottom:10px">Chatea con el taller o escala con la marca.</div>
+                <div style="display:flex;gap:8px"><button class="btn btn-s btn-sm" onclick="navC('c-chat',document.querySelector('[data-page=c-chat]'))">Abrir chat</button><button class="btn btn-s btn-sm" onclick="showToast('Escalamiento enviado a Nissan México','suc')">Escalar</button></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CHAT -->
+        <div class="page" id="pg-c-chat">
+          <div class="ph"><div class="pt">Mensajería</div><div class="ps">Comunicación directa entre las partes</div></div>
+          <div class="chat-wrap">
+            <div class="clist">
+              <div style="padding:8px;border-bottom:1px solid var(--border);font-size:10px;font-weight:700;color:var(--text2)">CONVERSACIONES</div>
+              <div class="ci on"><div class="av av26 a-am">RS</div><div style="flex:1;min-width:0"><div class="ci-name">Rodrigo Sánchez</div><div class="ci-sub">Nissan Satélite · #GR-2471</div></div><span class="nb r" style="font-size:9px">2</span></div>
+              <div class="ci"><div class="av av26 a-gr">NM</div><div style="flex:1;min-width:0"><div class="ci-name">Nissan México</div><div class="ci-sub">#GR-2468</div></div><span class="nb r" style="font-size:9px">1</span></div>
+              <div class="ci"><div class="av av26 a-pu">TC</div><div><div class="ci-name">Toyota Centro</div><div class="ci-sub">#GR-2468</div></div></div>
+            </div>
+            <div class="cmain">
+              <div class="chead">
+                <div class="av av32 a-am">RS</div>
+                <div><div style="font-size:13px;font-weight:600">Rodrigo Sánchez</div><div style="font-size:10px;color:var(--green)">● En línea · Nissan Satélite</div></div>
+                <span class="bdg b-am" style="margin-left:auto">#GR-2471</span>
+              </div>
+              <div class="msgs" id="chatMsgsC">
+                <div style="text-align:center;font-size:10px;color:var(--text3);padding:4px">11 Jul 2025</div>
+                <div class="msg ot"><div class="av av26 a-am" style="flex-shrink:0">RS</div><div><div class="mb2">Buenos días Sr. Mendoza. Hemos recibido su vehículo y comenzamos la revisión. Le notificaremos antes de las 6pm.</div><div class="mm">Rodrigo · 09:02 · ✓✓</div></div></div>
+                <div class="msg me"><div><div class="mb2">¿Necesitan que esté presente?</div><div class="mm">Yo · 09:15 · ✓✓</div></div><div class="av av26 a-bl" style="flex-shrink:0">CM</div></div>
+                <div class="msg ot"><div class="av av26 a-am" style="flex-shrink:0">RS</div><div><div class="mb2">No es necesario. Le enviamos reporte detallado antes de las 6pm. Verificaremos cobertura de garantía.</div><div class="mm">Rodrigo · 09:18 · ✓✓</div></div></div>
+                <div style="text-align:center;font-size:10px;color:var(--text3);padding:4px">Hoy</div>
+                <div class="msg ot"><div class="av av26 a-am" style="flex-shrink:0">RS</div><div><div class="mb2">Actualización: falla en 2 inyectores. Cubierto al 100% por garantía. Reparación en 2 días hábiles.</div><div class="mm">Rodrigo · Hoy 09:15 · ✓</div></div></div>
+              </div>
+              <div class="cinput">
+                <input type="text" id="chatInputC" placeholder="Escribe un mensaje..." onkeypress="sendChatC(event)">
+                <button class="csend" onclick="sendChatCBtn()"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22,2 15,22 11,13 2,9 22,2"/></svg></button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RESOLUCIÓN -->
+        <div class="page" id="pg-c-resolucion">
+          <div class="ph"><div class="pt">Resolución de Garantía</div><div class="ps">Propuesta de acuerdo — Solicitud #GR-2471</div></div>
+          <div class="g21">
+            <div>
+              <div class="card card-p" style="margin-bottom:14px">
+                <div style="display:flex;align-items:center;gap:12px;padding:13px;background:var(--green-l);border:1px solid #BBF7D0;border-radius:10px;margin-bottom:16px">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#15803D" stroke-width="2" style="width:26px;flex-shrink:0"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                  <div><div style="font-size:14px;font-weight:700;color:#15803D">Garantía procedente</div><div style="font-size:11px;color:#166534">Aprobada por taller y Nissan México</div></div>
+                </div>
+                <div style="font-size:13px;font-weight:700;margin-bottom:10px">Términos del acuerdo</div>
+                <div style="background:var(--gray);border-radius:8px;padding:13px;margin-bottom:14px">
+                  <div class="iro"><span class="il">Tipo de resolución</span><span class="iv">Reparación sin costo</span></div>
+                  <div class="iro"><span class="il">Piezas reemplazadas</span><span class="iv">2 inyectores Denso</span></div>
+                  <div class="iro"><span class="il">Costo para propietario</span><span class="iv" style="color:var(--green);font-weight:800">$0.00 MXN</span></div>
+                  <div class="iro"><span class="il">Cobertura</span><span class="iv">Garantía de fábrica</span></div>
+                  <div class="iro"><span class="il">Entrega estimada</span><span class="iv">2 días hábiles</span></div>
+                  <div class="iro"><span class="il">Garantía de reparación</span><span class="iv">12 meses adicionales</span></div>
+                </div>
+                <div style="margin-bottom:14px"><label class="lbl">Firma electrónica</label>
+                  <div class="sign-box" id="signBoxC" onclick="doSignC()">
+                    <div id="signContentC" style="text-align:center">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="2" style="width:26px;margin:0 auto 6px"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                      <div style="font-size:12px;color:var(--text2)">Haz clic para firmar digitalmente</div>
+                      <div style="font-size:10px;color:var(--text3)">Validez legal NOM-151</div>
+                    </div>
+                  </div>
+                </div>
+                <div style="display:flex;gap:8px">
+                  <button class="btn btn-err" style="flex:1;justify-content:center">Rechazar</button>
+                  <button class="btn btn-suc" style="flex:1;justify-content:center" onclick="acceptResC()"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/></svg>Aceptar y firmar</button>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div class="card card-p" style="margin-bottom:12px">
+                <div style="font-size:13px;font-weight:700;margin-bottom:10px">Aprobaciones</div>
+                <div style="display:flex;flex-direction:column;gap:10px">
+                  <div style="display:flex;align-items:center;gap:8px"><svg viewBox="0 0 24 24" fill="none" stroke="#15803D" stroke-width="2" style="width:16px;flex-shrink:0"><circle cx="12" cy="12" r="10"/><path d="M9 11l3 3L22 4"/></svg><div style="flex:1"><div style="font-size:12px;font-weight:600">Nissan Satélite</div></div><span class="bdg b-gr">Aprobado</span></div>
+                  <div style="display:flex;align-items:center;gap:8px"><svg viewBox="0 0 24 24" fill="none" stroke="#15803D" stroke-width="2" style="width:16px;flex-shrink:0"><circle cx="12" cy="12" r="10"/><path d="M9 11l3 3L22 4"/></svg><div style="flex:1"><div style="font-size:12px;font-weight:600">Nissan México</div></div><span class="bdg b-gr">Aprobado</span></div>
+                  <div style="display:flex;align-items:center;gap:8px"><svg viewBox="0 0 24 24" fill="none" stroke="var(--amber)" stroke-width="2" style="width:16px;flex-shrink:0"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg><div style="flex:1"><div style="font-size:12px;font-weight:600">Carlos Mendoza</div></div><span class="bdg b-am">Pendiente</span></div>
+                </div>
+              </div>
+              <div class="card card-p">
+                <div style="font-size:13px;font-weight:700;margin-bottom:8px">Califica la atención</div>
+                <div class="stars"><span class="star on" onclick="rateC(1)">★</span><span class="star on" onclick="rateC(2)">★</span><span class="star on" onclick="rateC(3)">★</span><span class="star on" onclick="rateC(4)">★</span><span class="star" onclick="rateC(5)">★</span></div>
+                <textarea class="inp" style="min-height:60px" placeholder="Comentarios opcionales..."></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- VEHÍCULOS -->
+        <div class="page" id="pg-c-vehiculos">
+          <div class="ph" style="display:flex;justify-content:space-between;align-items:center"><div><div class="pt">Mis Vehículos</div><div class="ps">2 vehículos registrados</div></div><button class="btn btn-p" onclick="showToast('Formulario de registro VIN abierto','')"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Registrar vehículo</button></div>
+          <div class="g2">
+            <div class="card card-p"><div style="display:flex;align-items:center;gap:12px;margin-bottom:14px"><div style="width:52px;height:52px;background:var(--blue-l);border-radius:11px;display:flex;align-items:center;justify-content:center"><svg viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2" style="width:28px"><path d="M5 17H3a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v9a2 2 0 0 1-2 2h-2"/><circle cx="7.5" cy="17.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg></div><div><div style="font-size:15px;font-weight:700">Nissan Sentra 2023</div><div style="font-size:10px;color:var(--text3);font-family:monospace">3N1AB7AP9PY123456</div><span class="bdg b-gr" style="margin-top:5px;display:inline-flex">En garantía</span></div></div>
+              <div class="divider"></div>
+              <div class="iro"><span class="il">Color</span><span class="iv">Gris Plata</span></div>
+              <div class="iro"><span class="il">Motor</span><span class="iv">1.6L HR16DE</span></div>
+              <div class="iro"><span class="il">Km actuales</span><span class="iv">48,200 km</span></div>
+              <div class="iro"><span class="il">Garantía hasta</span><span class="iv" style="color:var(--green)">Mar 2026 ✓</span></div>
+              <div class="divider"></div>
+              <div style="display:flex;gap:8px"><button class="btn btn-s btn-sm">Ver documentos</button><button class="btn btn-p btn-sm" onclick="navC('c-nueva',document.querySelector('[data-page=c-nueva]'))">Nueva garantía</button></div>
+            </div>
+            <div class="card card-p"><div style="display:flex;align-items:center;gap:12px;margin-bottom:14px"><div style="width:52px;height:52px;background:var(--gray);border-radius:11px;display:flex;align-items:center;justify-content:center"><svg viewBox="0 0 24 24" fill="none" stroke="var(--text2)" stroke-width="2" style="width:28px"><path d="M5 17H3a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v9a2 2 0 0 1-2 2h-2"/><circle cx="7.5" cy="17.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg></div><div><div style="font-size:15px;font-weight:700">Ford Explorer 2024</div><div style="font-size:10px;color:var(--text3);font-family:monospace">1FM5K8D89RGA23412</div><span class="bdg b-gr" style="margin-top:5px;display:inline-flex">En garantía</span></div></div>
+              <div class="divider"></div>
+              <div class="iro"><span class="il">Color</span><span class="iv">Negro Estelar</span></div>
+              <div class="iro"><span class="il">Motor</span><span class="iv">2.3L EcoBoost</span></div>
+              <div class="iro"><span class="il">Km actuales</span><span class="iv">12,890 km</span></div>
+              <div class="iro"><span class="il">Garantía hasta</span><span class="iv" style="color:var(--green)">Oct 2027 ✓</span></div>
+              <div class="divider"></div>
+              <div style="display:flex;gap:8px"><button class="btn btn-s btn-sm">Ver documentos</button><button class="btn btn-p btn-sm" onclick="navC('c-nueva',document.querySelector('[data-page=c-nueva]'))">Nueva garantía</button></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- HISTORIAL -->
+        <div class="page" id="pg-c-historial">
+          <div class="ph" style="display:flex;justify-content:space-between;align-items:center"><div><div class="pt">Historial de Garantías</div><div class="ps">Registro completo</div></div><div style="display:flex;gap:8px"><button class="btn btn-s btn-sm" onclick="showToast('Exportando...','suc')">Excel</button><button class="btn btn-s btn-sm" onclick="showToast('PDF generado','suc')">PDF</button></div></div>
+          <div class="card">
+            <table class="tbl"><thead><tr><th>ID</th><th>Vehículo</th><th>Categoría</th><th>Apertura</th><th>Cierre</th><th>Días</th><th>Estado</th><th>NPS</th></tr></thead><tbody>
+              <tr><td><b style="color:var(--blue);font-family:monospace">#GR-2471</b></td><td>Sentra 2023</td><td>Motor</td><td>10 Jul 25</td><td>—</td><td>11</td><td><span class="bdg b-am">Activo</span></td><td>—</td></tr>
+              <tr><td><b style="color:var(--blue);font-family:monospace">#GR-2460</b></td><td>Explorer 2024</td><td>Transmisión</td><td>2 Jul 25</td><td>7 Jul 25</td><td>5</td><td><span class="bdg b-gr">Aprobada</span></td><td>⭐⭐⭐⭐⭐</td></tr>
+              <tr><td><b style="color:var(--blue);font-family:monospace">#GR-2455</b></td><td>Equinox 2023</td><td>Eléctrico</td><td>28 Jun 25</td><td>3 Jul 25</td><td>5</td><td><span class="bdg b-rd">Rechazada</span></td><td>⭐⭐</td></tr>
+              <tr><td><b style="color:var(--blue);font-family:monospace">#GR-2441</b></td><td>Sentra 2023</td><td>A/C</td><td>15 Jun 25</td><td>20 Jun 25</td><td>5</td><td><span class="bdg b-gr">Aprobada</span></td><td>⭐⭐⭐⭐</td></tr>
+            </tbody></table>
+          </div>
+        </div>
+
+        <!-- PERFIL -->
+        <div class="page" id="pg-c-perfil">
+          <div class="ph"><div class="pt">Mi Perfil</div><div class="ps">Datos personales y configuración</div></div>
+          <div class="g21">
+            <div>
+              <div class="card card-p" style="margin-bottom:14px">
+                <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px"><div class="av" style="width:58px;height:58px;font-size:20px;font-weight:800;background:var(--blue-l);color:var(--blue)">CM</div><div><div style="font-size:17px;font-weight:800">Carlos Mendoza</div><div style="font-size:12px;color:var(--text2)">Consumidor · Miembro desde Mar 2023</div><span class="bdg b-gr" style="margin-top:6px;display:inline-flex">Cuenta verificada</span></div></div>
+                <div class="divider"></div>
+                <div class="frow c2"><div><label class="lbl">Nombre</label><input class="inp" value="Carlos"></div><div><label class="lbl">Apellido</label><input class="inp" value="Mendoza García"></div></div>
+                <div class="frow c2"><div><label class="lbl">Correo</label><input class="inp" type="email" value="carlos.mendoza@email.com"></div><div><label class="lbl">Teléfono</label><input class="inp" value="+52 55 1234 5678"></div></div>
+                <div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn btn-s">Cancelar</button><button class="btn btn-p" onclick="showToast('Perfil actualizado correctamente','suc')">Guardar cambios</button></div>
+              </div>
+            </div>
+            <div>
+              <div class="card card-p">
+                <div style="font-size:13px;font-weight:700;margin-bottom:10px">Estadísticas personales</div>
+                <div class="krow"><span class="kn">Solicitudes creadas</span><span class="kv">16</span></div>
+                <div class="krow"><span class="kn">Garantías aprobadas</span><span class="kv" style="color:var(--green)">13</span></div>
+                <div class="krow"><span class="kn">Ahorro total</span><span class="kv" style="color:var(--blue)">$84,200</span></div>
+                <div class="krow"><span class="kn">NPS promedio</span><span class="kv">4.3 ⭐</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ======= APP SHELL: TALLER ======= -->
+<div class="app-shell" id="app-taller">
+  <div class="role-bar taller">
+    <div class="rb-left"><svg viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>GARANTÍA360 — Vista Técnico / Taller</div>
+    <div class="rb-back" onclick="backToLanding()"><svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>Cambiar rol</div>
+  </div>
+  <div class="main-layout">
+    <aside class="sidebar taller">
+      <div class="sh"><div class="li" style="background:var(--amber)"><svg viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></div><div><div class="lt">GARANTÍA360</div><div class="ls">PANEL TALLER</div></div></div>
+      <div class="role-pill"><svg viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg><span>Técnico / Taller</span></div>
+      <nav class="snav">
+        <div class="slbl">Principal</div>
+        <div class="ni on" data-page="t-dashboard" onclick="navT('t-dashboard',this)"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard</div>
+        <div class="ni" data-page="t-casos" onclick="navT('t-casos',this)"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>Casos asignados <span class="nb">5</span></div>
+        <div class="ni" data-page="t-diagnostico" onclick="navT('t-diagnostico',this)"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Diagnóstico activo <span class="nb" style="background:var(--amber)">2</span></div>
+        <div class="ni" data-page="t-cotizacion" onclick="navT('t-cotizacion',this)"><svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Cotización</div>
+        <div class="slbl">Comunicación</div>
+        <div class="ni" data-page="t-chat" onclick="navT('t-chat',this)"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Chat con cliente <span class="nb">3</span></div>
+        <div class="slbl">Historial</div>
+        <div class="ni" data-page="t-rendimiento" onclick="navT('t-rendimiento',this)"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Mi rendimiento</div>
+        <div class="slbl">Automatización</div>
+        <div class="ni" data-page="t-auto" onclick="navT('t-auto',this)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>Auto vs Humano <span class="nb" style="background:var(--green)">★</span></div>
+        <div class="ni" data-page="t-monitor" onclick="navT('t-monitor',this)"><svg viewBox="0 0 24 24"><polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/></svg>Monitor SLA <span class="nb" style="background:var(--amber)">3</span></div>
+        <div class="ni" data-page="t-flujo" onclick="navT('t-flujo',this)"><svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>Flujo escalamiento</div>
+      </nav>
+      <div class="sf"><div class="av av32 a-am">RS</div><div><div class="uname">Rodrigo Sánchez</div><div class="urole">Nissan Satélite · Técnico Sr.</div></div></div>
+    </aside>
+    <div class="content-area">
+      <div class="topbar">
+        <div class="bc">GARANTÍA360 › <span class="cur" id="bc-t">Dashboard</span></div>
+        <div class="ta">
+          <div class="ibtn" onclick="showToast('2 alertas SLA críticas','err')"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span class="ndot"></span></div>
+          <button class="btn btn-am btn-sm" onclick="navT('t-diagnostico',document.querySelector('[data-page=t-diagnostico]'))"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Nuevo diagnóstico</button>
+        </div>
+      </div>
+      <div class="content-scroll">
+
+        <!-- TALLER DASHBOARD -->
+        <div class="page on" id="pg-t-dashboard">
+          <div class="ph"><div class="pt">Panel del Técnico</div><div class="ps">Rodrigo Sánchez · Nissan Satélite · Julio 2025</div></div>
+          <div class="g3">
+            <div class="mc"><div class="ml">Casos activos hoy</div><div class="mv" style="color:var(--amber)">5</div><div class="mch">3 en diagnóstico · 2 en espera</div><div class="pb"><div class="pf pam" style="width:62%"></div></div></div>
+            <div class="mc"><div class="ml">Resueltos este mes</div><div class="mv" style="color:var(--green)">23</div><div class="mch up">↑ 4 vs mes anterior</div><div class="pb"><div class="pf pgr" style="width:77%"></div></div></div>
+            <div class="mc"><div class="ml">Ranking taller</div><div class="mv" style="color:var(--amber)">#2</div><div class="mch">de 8 técnicos · NPS 4.6</div><div class="pb"><div class="pf pbl" style="width:80%"></div></div></div>
+          </div>
+          <div class="g2">
+            <div>
+              <div style="font-size:13px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between">Casos prioritarios <button class="btn btn-g btn-sm" onclick="navT('t-casos',document.querySelector('[data-page=t-casos]'))">Ver todos →</button></div>
+              <div class="case-card urg" onclick="navT('t-diagnostico',document.querySelector('[data-page=t-diagnostico]'))">
+                <div style="display:flex;justify-content:space-between;margin-bottom:7px"><span style="font-family:monospace;font-size:11px;font-weight:700;color:var(--blue)">#GR-2471</span><span class="bdg b-rd">SLA: HOY</span></div>
+                <div style="font-size:13px;font-weight:600;margin-bottom:4px">Nissan Sentra 2023 — Inyectores</div>
+                <div style="font-size:11px;color:var(--text2);margin-bottom:8px">Carlos Mendoza · OBD: P0300, P0301, P0303</div>
+                <div style="display:flex;gap:8px;align-items:center"><div style="flex:1"><div class="sla-bar"><div style="height:100%;width:100%;background:var(--red);border-radius:3px"></div></div></div><button class="btn btn-am btn-sm" onclick="event.stopPropagation();navT('t-diagnostico',document.querySelector('[data-page=t-diagnostico]'))">Abrir</button></div>
+              </div>
+              <div class="case-card norm" onclick="showToast('Caso #GR-2468 abierto','')">
+                <div style="display:flex;justify-content:space-between;margin-bottom:7px"><span style="font-family:monospace;font-size:11px;font-weight:700;color:var(--blue)">#GR-2468</span><span class="bdg b-bl">2 días SLA</span></div>
+                <div style="font-size:13px;font-weight:600;margin-bottom:4px">Nissan Kicks 2022 — ABS</div>
+                <div style="font-size:11px;color:var(--text2)">María López · Sin diagnóstico</div>
+              </div>
+              <div class="case-card low">
+                <div style="display:flex;justify-content:space-between;margin-bottom:7px"><span style="font-family:monospace;font-size:11px;font-weight:700;color:var(--blue)">#GR-2465</span><span class="bdg b-gr">4 días SLA</span></div>
+                <div style="font-size:13px;font-weight:600;margin-bottom:4px">Nissan Versa 2024 — A/C</div>
+                <div style="font-size:11px;color:var(--text2)">Pedro García · 2 fotos adjuntas</div>
+              </div>
+            </div>
+            <div>
+              <div class="card card-p" style="margin-bottom:12px">
+                <div style="font-size:13px;font-weight:700;margin-bottom:10px">Mi rendimiento — Julio</div>
+                <div class="krow"><span class="kn">Casos resueltos</span><span class="kv" style="color:var(--green)">23</span></div>
+                <div class="krow"><span class="kn">Tasa de aprobación</span><span class="kv" style="color:var(--green)">94%</span></div>
+                <div class="krow"><span class="kn">NPS recibido</span><span class="kv">4.6 ⭐</span></div>
+                <div class="krow"><span class="kn">Tiempo prom.</span><span class="kv">1.8 días</span></div>
+              </div>
+              <div class="card card-p" style="background:var(--amber-l);border-color:#FDE68A">
+                <div style="font-size:12px;font-weight:700;color:#92400E;margin-bottom:6px">⚠ Alerta SLA</div>
+                <div style="font-size:11px;color:#B45309;margin-bottom:8px">El caso #GR-2471 vence <strong>hoy a las 18:00</strong>.</div>
+                <button class="btn btn-am btn-sm" onclick="navT('t-diagnostico',document.querySelector('[data-page=t-diagnostico]'))">Ir al diagnóstico →</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CASOS -->
+        <div class="page" id="pg-t-casos">
+          <div class="ph"><div class="pt">Casos Asignados</div><div class="ps">5 casos activos · Por prioridad SLA</div></div>
+          <div class="card">
+            <table class="tbl"><thead><tr><th>ID</th><th>Vehículo</th><th>Falla</th><th>SLA</th><th>Prioridad</th><th>Estado</th><th></th></tr></thead><tbody>
+              <tr onclick="navT('t-diagnostico',document.querySelector('[data-page=t-diagnostico]'))"><td><b style="color:var(--blue);font-family:monospace">#GR-2471</b></td><td>Sentra 2023 / C. Mendoza</td><td>Inyectores P0300</td><td><span style="color:var(--red);font-weight:700">HOY</span></td><td><span class="bdg b-rd">Urgente</span></td><td><span class="bdg b-am">En diagnóstico</span></td><td><button class="btn btn-am btn-sm">Abrir</button></td></tr>
+              <tr><td><b style="color:var(--blue);font-family:monospace">#GR-2468</b></td><td>Kicks 2022 / M. López</td><td>ABS</td><td><span style="color:var(--amber);font-weight:700">2 días</span></td><td><span class="bdg b-am">Normal</span></td><td><span class="bdg b-bl">Asignada</span></td><td><button class="btn btn-s btn-sm">Abrir</button></td></tr>
+              <tr><td><b style="color:var(--blue);font-family:monospace">#GR-2465</b></td><td>Versa 2024 / P. García</td><td>A/C</td><td><span style="color:var(--green);font-weight:700">4 días</span></td><td><span class="bdg b-gr">Bajo</span></td><td><span class="bdg b-bl">Asignada</span></td><td><button class="btn btn-s btn-sm">Abrir</button></td></tr>
+            </tbody></table>
+          </div>
+        </div>
+
+        <!-- DIAGNÓSTICO -->
+        <div class="page" id="pg-t-diagnostico">
+          <div class="ph" style="display:flex;justify-content:space-between;align-items:flex-start">
+            <div><div style="display:flex;align-items:center;gap:10px;margin-bottom:3px"><div class="pt" style="margin:0">Diagnóstico — #GR-2471</div><span class="bdg b-rd">SLA: HOY</span></div><div class="ps">Nissan Sentra 2023 · Carlos Mendoza</div></div>
+            <div style="display:flex;gap:8px"><button class="btn btn-s btn-sm" onclick="navT('t-chat',document.querySelector('[data-page=t-chat]'))">Chat cliente</button><button class="btn btn-am btn-sm" onclick="navT('t-cotizacion',document.querySelector('[data-page=t-cotizacion]'))">Cotización →</button></div>
+          </div>
+          <div class="g21">
+            <div>
+              <div class="card card-p" style="margin-bottom:14px">
+                <div style="font-size:13px;font-weight:700;margin-bottom:12px">Diagnóstico técnico</div>
+                <div class="frow c2"><div><label class="lbl">Código OBD-II</label><input class="inp" value="P0300, P0301, P0303"></div><div><label class="lbl">Sistema</label><select class="inp"><option>Sistema de inyección</option></select></div></div>
+                <div style="margin-bottom:12px"><label class="lbl">Diagnóstico</label><textarea class="inp" style="min-height:90px;resize:vertical">2 inyectores defectuosos (cilindros 1 y 3). ECU registra 47 eventos desde el 5 de julio. Defecto de fabricación — lote Denso IFR6E11 Ene-Mar 2023.</textarea></div>
+                <div class="frow c2"><div><label class="lbl">Causa raíz</label><select class="inp"><option>Defecto de fabricación</option></select></div><div><label class="lbl">Acción</label><select class="inp"><option>Reemplazo bajo garantía</option></select></div></div>
+                <div class="upload-zone" onclick="showToast('Cámara abierta','')"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17,8 12,3 7,8"/><line x1="12" y1="3" x2="12" y2="15"/></svg><div style="font-size:12px;color:var(--text2)">Subir fotos / video del diagnóstico</div></div>
+                <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:12px"><button class="btn btn-s">Guardar borrador</button><button class="btn btn-am" onclick="navT('t-cotizacion',document.querySelector('[data-page=t-cotizacion]'))">Continuar a cotización <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button></div>
+              </div>
+            </div>
+            <div>
+              <div class="card card-p" style="margin-bottom:12px">
+                <div style="font-size:13px;font-weight:700;margin-bottom:10px">Historial del vehículo</div>
+                <div class="tl">
+                  <div class="tli"><div class="tld am"><svg viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></div><div class="tlb"><div class="tlt">Caso actual — Inyectores</div><div class="tltm">10 Jul 2025</div></div></div>
+                  <div class="tli"><div class="tld gr"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/></svg></div><div class="tlb"><div class="tlt">A/C reparado — #GR-2441</div><div class="tltm">Jun 2025</div></div></div>
+                  <div class="tli"><div class="tld gy"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg></div><div class="tlb"><div class="tlt">Entrega del vehículo</div><div class="tltm">Mar 2023 · 0 km</div></div></div>
+                </div>
+              </div>
+              <div class="card card-p" style="background:var(--green-l);border-color:#BBF7D0">
+                <div style="display:flex;gap:8px"><svg viewBox="0 0 24 24" fill="none" stroke="#15803D" stroke-width="2" style="width:16px;flex-shrink:0"><path d="M9 11l3 3L22 4"/></svg><div><div style="font-size:12px;font-weight:700;color:#15803D">Garantía vigente</div><div style="font-size:11px;color:#166534;margin-top:2px">Hasta Mar 2026. Procede cobertura total.</div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- COTIZACIÓN TALLER -->
+        <div class="page" id="pg-t-cotizacion">
+          <div class="ph" style="display:flex;justify-content:space-between;align-items:center"><div><div class="pt">Cotización — #GR-2471</div><div class="ps">Nissan Sentra 2023</div></div><button class="btn btn-suc" onclick="showToast('Cotización enviada a Nissan México y al cliente','suc')"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/></svg>Aprobar y enviar</button></div>
+          <div class="card" style="margin-bottom:14px">
+            <table class="tbl"><thead><tr><th>Concepto</th><th>Cant.</th><th>Precio</th><th>Total</th><th>Cobertura</th></tr></thead><tbody>
+              <tr><td>Inyector Denso IFR6E11</td><td>2</td><td>$3,200</td><td><b>$6,400</b></td><td><span class="bdg b-gr">100%</span></td></tr>
+              <tr><td>Mano de obra técnica</td><td>3 hrs</td><td>$680</td><td><b>$2,040</b></td><td><span class="bdg b-gr">100%</span></td></tr>
+              <tr><td>Limpieza admisión</td><td>1</td><td>$0</td><td><b style="color:var(--green)">Incluido</b></td><td><span class="bdg b-gr">100%</span></td></tr>
+              <tr><td colspan="2" style="font-weight:700;text-align:right">Total garantía</td><td></td><td><b style="color:var(--blue);font-size:15px">$8,440</b></td><td><b style="color:var(--green)">$0 cliente</b></td></tr>
+            </tbody></table>
+          </div>
+        </div>
+
+        <!-- CHAT TALLER -->
+        <div class="page" id="pg-t-chat">
+          <div class="ph"><div class="pt">Chat con Clientes</div><div class="ps">3 conversaciones activas</div></div>
+          <div class="chat-wrap">
+            <div class="clist">
+              <div class="ci on"><div class="av av26 a-bl">CM</div><div style="flex:1;min-width:0"><div class="ci-name">Carlos Mendoza</div><div class="ci-sub">#GR-2471</div></div><span class="nb r" style="font-size:9px">2</span></div>
+              <div class="ci"><div class="av av26 a-pu">ML</div><div><div class="ci-name">María López</div><div class="ci-sub">#GR-2468</div></div><span class="nb r" style="font-size:9px">1</span></div>
+              <div class="ci"><div class="av av26 a-gr">PG</div><div><div class="ci-name">Pedro García</div><div class="ci-sub">#GR-2465</div></div></div>
+            </div>
+            <div class="cmain">
+              <div class="chead"><div class="av av32 a-bl">CM</div><div><div style="font-size:13px;font-weight:600">Carlos Mendoza</div><div style="font-size:10px;color:var(--green)">● En línea</div></div><span class="bdg b-rd" style="margin-left:auto">SLA: HOY</span></div>
+              <div class="msgs" id="chatMsgsT">
+                <div class="msg me"><div><div class="mb2" style="background:var(--amber);color:#fff">Buenos días. Vehículo recibido, iniciamos revisión.</div><div class="mm">RS · 09:02 · ✓✓</div></div><div class="av av26 a-am" style="flex-shrink:0">RS</div></div>
+                <div class="msg ot"><div class="av av26 a-bl" style="flex-shrink:0">CM</div><div><div class="mb2">¿Necesitan que esté presente?</div><div class="mm">Carlos · 09:15 · ✓✓</div></div></div>
+                <div class="msg me"><div><div class="mb2" style="background:var(--amber);color:#fff">No es necesario. Le notificamos antes de las 6pm.</div><div class="mm">RS · 09:18 · ✓✓</div></div><div class="av av26 a-am" style="flex-shrink:0">RS</div></div>
+                <div class="msg me"><div><div class="mb2" style="background:var(--amber);color:#fff">Diagnóstico listo: 2 inyectores defectuosos. Cubierto 100% garantía. Reparación en 2 días.</div><div class="mm">RS · Hoy · ✓</div></div><div class="av av26 a-am" style="flex-shrink:0">RS</div></div>
+              </div>
+              <div class="cinput" style="--blue:var(--amber)">
+                <input type="text" id="chatInputT" placeholder="Responder a Carlos Mendoza..." onkeypress="sendChatT(event)">
+                <button class="csend" style="background:var(--amber)" onclick="sendChatTBtn()"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22,2 15,22 11,13 2,9 22,2"/></svg></button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RENDIMIENTO -->
+        <div class="page" id="pg-t-rendimiento">
+          <div class="ph"><div class="pt">Mi Rendimiento</div><div class="ps">Métricas individuales — Julio 2025</div></div>
+          <div class="g3" style="margin-bottom:14px">
+            <div class="mc"><div class="ml">Casos resueltos</div><div class="mv" style="color:var(--green)">23</div><div class="mch up">↑ 4 vs Jun</div></div>
+            <div class="mc"><div class="ml">NPS recibido</div><div class="mv">4.6 ⭐</div></div>
+            <div class="mc"><div class="ml">Ranking taller</div><div class="mv" style="color:var(--amber)">#2 <span style="font-size:13px;color:var(--text2)">/ 8</span></div></div>
+          </div>
+          <div class="g2">
+            <div class="card card-p">
+              <div style="font-size:13px;font-weight:700;margin-bottom:12px">Distribución de resultados</div>
+              <div class="mbar"><span style="font-size:11px;color:var(--text2);width:90px">Aprobadas</span><div class="mbt"><div class="mbf pgr" style="width:87%"></div></div><span class="mbv" style="color:var(--green)">20</span></div>
+              <div class="mbar"><span style="font-size:11px;color:var(--text2);width:90px">Rechazadas</span><div class="mbt"><div class="mbf prd" style="width:9%"></div></div><span class="mbv" style="color:var(--red)">2</span></div>
+              <div class="mbar"><span style="font-size:11px;color:var(--text2);width:90px">Escalamientos</span><div class="mbt"><div class="mbf pam" style="width:9%"></div></div><span class="mbv" style="color:var(--amber)">2</span></div>
+            </div>
+            <div class="card card-p">
+              <div style="font-size:13px;font-weight:700;margin-bottom:10px">Comentarios de clientes</div>
+              <div style="background:var(--gray);border-radius:7px;padding:10px;margin-bottom:8px"><div style="font-size:11px;font-weight:600;margin-bottom:3px">⭐⭐⭐⭐⭐ — #GR-2460</div><div style="font-size:11px;color:var(--text2)">"Diagnóstico muy claro y rápido."</div></div>
+              <div style="background:var(--gray);border-radius:7px;padding:10px"><div style="font-size:11px;font-weight:600;margin-bottom:3px">⭐⭐⭐⭐ — #GR-2441</div><div style="font-size:11px;color:var(--text2)">"Buena comunicación. Sin costo."</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- AUTO VS HUMANO PAGE -->
+        <div class="page" id="pg-t-auto">
+          <div class="ph"><div class="pt">Matriz de Riesgo y Complejidad</div><div class="ps">Algoritmo de enrutamiento automático — basado en el nivel de riesgo del caso</div></div>
+
+          <!-- INTRO -->
+          <div style="background:linear-gradient(135deg,#EBF2FF,#F0F9FF);border:1px solid #BFDBFE;border-radius:12px;padding:16px;margin-bottom:18px;display:flex;gap:14px;align-items:flex-start">
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2" style="width:22px;flex-shrink:0;margin-top:2px"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4"/></svg>
+            <div>
+              <div style="font-size:13px;font-weight:700;color:var(--blue);margin-bottom:4px">Sistema de enrutamiento inteligente</div>
+              <div style="font-size:12px;color:#1E40AF;line-height:1.6">La plataforma clasifica automáticamente cada caso mediante una <strong>Matriz de Riesgo y Complejidad</strong>. El 60% de los casos se resuelven sin intervención humana. Solo los casos críticos y de alta complejidad requieren mediador o gerencia.</div>
+            </div>
+          </div>
+
+          <!-- TRES SEMÁFOROS -->
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:20px">
+
+            <!-- SEMÁFORO ROJO: CRÍTICO -->
+            <div style="border-radius:12px;border:2px solid #FECACA;overflow:hidden">
+              <div style="background:var(--red);padding:14px;display:flex;align-items:center;gap:10px">
+                <div style="width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:20px">🔴</div>
+                <div><div style="font-size:14px;font-weight:800;color:#fff">CRÍTICO</div><div style="font-size:10px;color:rgba(255,255,255,.8);font-weight:500">Humano Directo — Fase 2</div></div>
+              </div>
+              <div style="padding:14px;background:#fff">
+                <div style="font-size:11px;font-weight:700;color:#B91C1C;margin-bottom:8px;text-transform:uppercase;letter-spacing:.04em">Criterios técnicos</div>
+                <div style="display:flex;flex-direction:column;gap:7px;margin-bottom:12px">
+                  <div style="display:flex;gap:7px;align-items:flex-start;font-size:11px"><span style="color:var(--red);font-weight:700;flex-shrink:0">●</span>Fallas de seguridad activa: dirección, frenos</div>
+                  <div style="display:flex;gap:7px;align-items:flex-start;font-size:11px"><span style="color:var(--red);font-weight:700;flex-shrink:0">●</span>Motor apagado en marcha</div>
+                  <div style="display:flex;gap:7px;align-items:flex-start;font-size:11px"><span style="color:var(--red);font-weight:700;flex-shrink:0">●</span>Fallas en airbags</div>
+                  <div style="display:flex;gap:7px;align-items:flex-start;font-size:11px"><span style="color:var(--red);font-weight:700;flex-shrink:0">●</span>Riesgo de responsabilidad civil o penal</div>
+                </div>
+                <div style="background:var(--red-l);border-radius:8px;padding:10px;margin-bottom:10px">
+                  <div style="font-size:11px;font-weight:700;color:#B91C1C;margin-bottom:5px">⚡ Acción automatizada</div>
+                  <div style="font-size:11px;color:#991B1B;line-height:1.6">• Notificación <strong>inmediata</strong> al área jurídica y gerencia general de la marca<br>• Envío de grúa y vehículo sustituto preventivo<br>• <strong>Se omite la negociación automática</strong></div>
+                </div>
+                <div style="background:#FFF5F5;border:1px solid #FECACA;border-radius:8px;padding:10px">
+                  <div style="font-size:11px;font-weight:700;color:#B91C1C;margin-bottom:3px">⏱ Tiempo de respuesta</div>
+                  <div style="font-size:13px;font-weight:800;color:var(--red)">Inmediato</div>
+                  <div style="font-size:10px;color:#991B1B">Sin etapas previas — escala directo a humano</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- SEMÁFORO AMARILLO: MEDIO -->
+            <div style="border-radius:12px;border:2px solid #FDE68A;overflow:hidden">
+              <div style="background:var(--amber);padding:14px;display:flex;align-items:center;gap:10px">
+                <div style="width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:20px">🟡</div>
+                <div><div style="font-size:14px;font-weight:800;color:#fff">MEDIO</div><div style="font-size:10px;color:rgba(255,255,255,.9);font-weight:500">Fase 1 — Negociación Automatizada</div></div>
+              </div>
+              <div style="padding:14px;background:#fff">
+                <div style="font-size:11px;font-weight:700;color:#92400E;margin-bottom:8px;text-transform:uppercase;letter-spacing:.04em">Criterios técnicos</div>
+                <div style="display:flex;flex-direction:column;gap:7px;margin-bottom:12px">
+                  <div style="display:flex;gap:7px;align-items:flex-start;font-size:11px"><span style="color:var(--amber);font-weight:700;flex-shrink:0">●</span>Fallas de confort: aire acondicionado</div>
+                  <div style="display:flex;gap:7px;align-items:flex-start;font-size:11px"><span style="color:var(--amber);font-weight:700;flex-shrink:0">●</span>Ruidos en suspensión</div>
+                  <div style="display:flex;gap:7px;align-items:flex-start;font-size:11px"><span style="color:var(--amber);font-weight:700;flex-shrink:0">●</span>Problemas de pintura</div>
+                  <div style="display:flex;gap:7px;align-items:flex-start;font-size:11px"><span style="color:var(--amber);font-weight:700;flex-shrink:0">●</span>Demoras en piezas de acabado</div>
+                </div>
+                <div style="background:var(--amber-l);border-radius:8px;padding:10px;margin-bottom:10px">
+                  <div style="font-size:11px;font-weight:700;color:#92400E;margin-bottom:5px">⚡ Acción automatizada</div>
+                  <div style="font-size:11px;color:#B45309;line-height:1.6">• Activación del <strong>motor de negociación automática</strong><br>• Propuestas de extensión de garantía<br>• Bonos de mantenimiento como compensación</div>
+                </div>
+                <div style="background:#FFFBEB;border:1px solid #FDE68A;border-radius:8px;padding:10px">
+                  <div style="font-size:11px;font-weight:700;color:#92400E;margin-bottom:3px">⏱ Plazo máximo</div>
+                  <div style="font-size:13px;font-weight:800;color:var(--amber)">5 días hábiles</div>
+                  <div style="font-size:10px;color:#B45309">Si no hay acuerdo → pasa a mediación humana</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- SEMÁFORO VERDE: BAJO -->
+            <div style="border-radius:12px;border:2px solid #BBF7D0;overflow:hidden">
+              <div style="background:var(--green);padding:14px;display:flex;align-items:center;gap:10px">
+                <div style="width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:20px">🟢</div>
+                <div><div style="font-size:14px;font-weight:800;color:#fff">BAJO</div><div style="font-size:10px;color:rgba(255,255,255,.9);font-weight:500">Auto resolución — Chatbot FAQ</div></div>
+              </div>
+              <div style="padding:14px;background:#fff">
+                <div style="font-size:11px;font-weight:700;color:#15803D;margin-bottom:8px;text-transform:uppercase;letter-spacing:.04em">Criterios técnicos</div>
+                <div style="display:flex;flex-direction:column;gap:7px;margin-bottom:12px">
+                  <div style="display:flex;gap:7px;align-items:flex-start;font-size:11px"><span style="color:var(--green);font-weight:700;flex-shrink:0">●</span>Consultas de cobertura de manuales</div>
+                  <div style="display:flex;gap:7px;align-items:flex-start;font-size:11px"><span style="color:var(--green);font-weight:700;flex-shrink:0">●</span>Descontento con costo de revisiones preventivas</div>
+                  <div style="display:flex;gap:7px;align-items:flex-start;font-size:11px"><span style="color:var(--green);font-weight:700;flex-shrink:0">●</span>Dudas sobre obligatoriedad de mantenimientos</div>
+                </div>
+                <div style="background:var(--green-l);border-radius:8px;padding:10px;margin-bottom:10px">
+                  <div style="font-size:11px;font-weight:700;color:#15803D;margin-bottom:5px">⚡ Acción automatizada</div>
+                  <div style="font-size:11px;color:#166534;line-height:1.6">• Despliegue de <strong>respuestas automáticas personalizadas</strong> basadas en el contrato del VIN<br>• Chatbot responde y cierra el caso</div>
+                </div>
+                <div style="background:#F0FFF4;border:1px solid #BBF7D0;border-radius:8px;padding:10px">
+                  <div style="font-size:11px;font-weight:700;color:#15803D;margin-bottom:3px">⏱ Tiempo de cierre</div>
+                  <div style="font-size:13px;font-weight:800;color:var(--green)">Inmediato</div>
+                  <div style="font-size:10px;color:#166534">100% automatizado — sin intervención humana</div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- TABLA RESUMEN -->
+          <div style="font-size:13px;font-weight:700;margin-bottom:12px">Tabla de enrutamiento — Resumen ejecutivo</div>
+          <div class="card">
+            <table class="tbl">
+              <thead><tr><th>Nivel de riesgo</th><th>Tipo de falla</th><th>Canal de resolución</th><th>Intervención humana</th><th>Plazo máximo</th><th>Semáforo</th></tr></thead>
+              <tbody>
+                <tr style="background:#FFF5F5">
+                  <td><b style="color:#B91C1C">Crítico</b></td>
+                  <td style="font-size:11px">Frenos, dirección, airbags, motor en marcha</td>
+                  <td><span class="bdg b-rd">Humano Directo</span></td>
+                  <td style="font-size:11px;font-weight:700;color:#B91C1C">✓ Sí — Jurídico + Gerencia</td>
+                  <td style="font-weight:700;color:var(--red)">Inmediato</td>
+                  <td style="font-size:20px">🔴</td>
+                </tr>
+                <tr style="background:#FFFBEB">
+                  <td><b style="color:#92400E">Medio</b></td>
+                  <td style="font-size:11px">A/C, suspensión, pintura, piezas de acabado</td>
+                  <td><span class="bdg b-am">Negociación Auto</span></td>
+                  <td style="font-size:11px;color:var(--amber)">Solo si falla la negociación</td>
+                  <td style="font-weight:700;color:var(--amber)">5 días hábiles</td>
+                  <td style="font-size:20px">🟡</td>
+                </tr>
+                <tr style="background:#F0FFF4">
+                  <td><b style="color:#15803D">Bajo</b></td>
+                  <td style="font-size:11px">Consultas, cobros, dudas de cobertura</td>
+                  <td><span class="bdg b-gr">Chatbot FAQ</span></td>
+                  <td style="font-size:11px;color:var(--green)">✗ No requerida</td>
+                  <td style="font-weight:700;color:var(--green)">Inmediato</td>
+                  <td style="font-size:20px">🟢</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- FACTOR HUMANO -->
+          <div style="margin-top:16px;font-size:13px;font-weight:700;margin-bottom:12px">Factor humano y mitigación de sesgos</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+            <div style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px">
+              <div style="font-size:12px;font-weight:700;color:var(--blue);margin-bottom:6px">⚖ Filtro de Equidad Contractual</div>
+              <div style="font-size:11px;color:var(--text2);line-height:1.6">Si la IA detecta una cláusula abusiva (ej. <em>"garantía se pierde por lavar el auto con shampoo no oficial"</em>), levanta una bandera de sesgo corporativo y le prohíbe usar ese argumento para denegar el caso.</div>
+            </div>
+            <div style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px">
+              <div style="font-size:12px;font-weight:700;color:var(--amber);margin-bottom:6px">👁 Revisión a un Clic</div>
+              <div style="font-size:11px;color:var(--text2);line-height:1.6">Los acuerdos sugeridos por la IA aparecen resaltados en el tablero del mediador mostrando pros, contras y la probabilidad de litigio judicial si no se firma. El humano edita, aprueba o rechaza.</div>
+            </div>
+            <div style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px">
+              <div style="font-size:12px;font-weight:700;color:var(--green);margin-bottom:6px">🔍 Transparencia de Algoritmos</div>
+              <div style="font-size:11px;color:var(--text2);line-height:1.6">El panel explica el razonamiento: <em>"Se sugiere aceptar el cambio de embrague porque el VIN registra 3 ingresos en menos de 6 meses por la misma causa, cumpliendo el estándar legal de falla reiterada."</em></div>
+            </div>
+          </div>
+
+          <!-- MÉTRICAS -->
+          <div style="margin-top:16px;display:grid;grid-template-columns:repeat(4,1fr);gap:12px">
+            <div style="background:var(--green-l);border:1px solid #BBF7D0;border-radius:10px;padding:14px;text-align:center"><div style="font-size:22px;font-weight:800;color:#15803D">60%</div><div style="font-size:10px;color:#166534;font-weight:600;margin-top:3px">Casos resueltos sin humano (Negociación Directa)</div></div>
+            <div style="background:var(--amber-l);border:1px solid #FDE68A;border-radius:10px;padding:14px;text-align:center"><div style="font-size:22px;font-weight:800;color:#92400E">14 días</div><div style="font-size:10px;color:#B45309;font-weight:600;margin-top:3px">Tiempo máximo en plataforma vs meses en juzgado</div></div>
+            <div style="background:var(--blue-l);border:1px solid #BFDBFE;border-radius:10px;padding:14px;text-align:center"><div style="font-size:22px;font-weight:800;color:var(--blue)">70%</div><div style="font-size:10px;color:#1E40AF;font-weight:600;margin-top:3px">Reducción costos legales operativos concesionarios</div></div>
+            <div style="background:var(--red-l);border:1px solid #FECACA;border-radius:10px;padding:14px;text-align:center"><div style="font-size:22px;font-weight:800;color:#B91C1C">0</div><div style="font-size:10px;color:#991B1B;font-weight:600;margin-top:3px">Negociaciones automáticas en casos críticos de seguridad</div></div>
+          </div>
+        </div>
+
+        <!-- MONITOR SLA PAGE -->        <!-- MONITOR SLA PAGE -->
+        <div class="page" id="pg-t-monitor">
+          <div class="ph"><div class="pt">Monitor SLA — Tiempo real</div><div class="ps">Estado de cronómetros y alertas automáticas activas</div></div>
+          <div class="g3" style="margin-bottom:16px">
+            <div class="mc"><div class="ml">En proceso automático</div><div class="mv" style="color:var(--green)">2</div><div class="mch up">Sin intervención requerida</div></div>
+            <div class="mc"><div class="ml">Requieren técnico</div><div class="mv" style="color:var(--amber)">3</div><div class="mch">Diagnóstico pendiente</div></div>
+            <div class="mc"><div class="ml">SLA crítico — escala hoy</div><div class="mv" style="color:var(--red)">1</div><div class="mch dn">Acción inmediata requerida</div></div>
+          </div>
+          <div class="card">
+            <div class="card-h"><div class="card-t">Casos activos con cronómetro SLA</div><button class="btn btn-s btn-sm" onclick="showToast('Vista actualizada','suc')">↻ Actualizar</button></div>
+            <table class="tbl">
+              <thead><tr><th>ID</th><th>Vehículo / Falla</th><th>Tipo</th><th>SLA consumido</th><th>Tiempo restante</th><th>Estado</th></tr></thead>
+              <tbody>
+                <tr style="background:#F0FFF4"><td><b style="color:var(--blue);font-family:monospace">#GR-2472</b></td><td><div style="font-size:12px;font-weight:600">Versa 2024 — Validación VIN</div><div style="font-size:10px;color:var(--text2)">Proceso automático activo</div></td><td><span class="bdg b-gr">Automático</span></td><td><div style="height:5px;background:#E5E7EB;border-radius:3px;overflow:hidden;width:120px"><div style="height:100%;width:8%;background:var(--green);border-radius:3px"></div></div><div style="font-size:9px;color:var(--text2);margin-top:2px">8% — 45 seg.</div></td><td style="font-weight:700;color:var(--green)">Auto</td><td><span class="bdg b-gr">Procesando</span></td></tr>
+                <tr style="background:#FFF5F5"><td><b style="color:var(--blue);font-family:monospace">#GR-2471</b></td><td><div style="font-size:12px;font-weight:600">Sentra 2023 — Diagnóstico motor</div><div style="font-size:10px;color:var(--red);font-weight:600">⚠ Escala en 42 minutos</div></td><td><span class="bdg b-am">Humano</span></td><td><div style="height:5px;background:#E5E7EB;border-radius:3px;overflow:hidden;width:120px"><div style="height:100%;width:97%;background:var(--red);border-radius:3px"></div></div><div style="font-size:9px;color:var(--red);font-weight:600;margin-top:2px">97% — CRÍTICO</div></td><td style="font-weight:700;color:var(--red)">00:42 hrs</td><td><span class="bdg b-rd">SLA crítico</span></td></tr>
+                <tr><td><b style="color:var(--blue);font-family:monospace">#GR-2468</b></td><td><div style="font-size:12px;font-weight:600">Kicks 2022 — ABS</div><div style="font-size:10px;color:var(--text2)">Técnico asignado</div></td><td><span class="bdg b-am">Humano</span></td><td><div style="height:5px;background:#E5E7EB;border-radius:3px;overflow:hidden;width:120px"><div style="height:100%;width:45%;background:var(--amber);border-radius:3px"></div></div><div style="font-size:9px;color:var(--text2);margin-top:2px">45% — 26 hrs rest.</div></td><td style="font-weight:700;color:var(--amber)">26:10 hrs</td><td><span class="bdg b-am">En progreso</span></td></tr>
+                <tr style="background:#F5F3FF"><td><b style="color:var(--blue);font-family:monospace">#GR-2450</b></td><td><div style="font-size:12px;font-weight:600">Pathfinder 2023 — Mediación</div><div style="font-size:10px;color:var(--text2)">Árbitro Ing. Morales — Día 2/5</div></td><td><span class="bdg b-pu">Árbitro</span></td><td><div style="height:5px;background:#E5E7EB;border-radius:3px;overflow:hidden;width:120px"><div style="height:100%;width:40%;background:var(--purple);border-radius:3px"></div></div><div style="font-size:9px;color:var(--text2);margin-top:2px">40% — 3 días rest.</div></td><td style="font-weight:700;color:var(--purple)">3 días</td><td><span class="bdg b-pu">Mediación</span></td></tr>
+                <tr style="background:#F0FFF4"><td><b style="color:var(--blue);font-family:monospace">#GR-2465</b></td><td><div style="font-size:12px;font-weight:600">Versa 2024 — Cierre automático</div><div style="font-size:10px;color:var(--green);font-weight:600">Firmas completas — generando PDF</div></td><td><span class="bdg b-gr">Automático</span></td><td><div style="height:5px;background:#E5E7EB;border-radius:3px;overflow:hidden;width:120px"><div style="height:100%;width:85%;background:var(--green);border-radius:3px"></div></div><div style="font-size:9px;color:var(--green);font-weight:600;margin-top:2px">85% — cerrando</div></td><td style="font-weight:700;color:var(--green)">5 min</td><td><span class="bdg b-gr">Cerrando</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- FLUJO ESCALAMIENTO PAGE -->
+        <div class="page" id="pg-t-flujo">
+          <div class="ph"><div class="pt">Flujo de escalamiento</div><div class="ps">Cómo pasa un caso de automático a intervención humana</div></div>
+          <div class="g2">
+            <div class="card card-p">
+              <div style="font-size:13px;font-weight:700;margin-bottom:16px">Flujo completo de un caso</div>
+              <div style="display:flex;flex-direction:column;gap:0">
+                <div style="display:flex;gap:14px;position:relative;padding-bottom:18px">
+                  <div style="position:absolute;left:18px;top:38px;bottom:0;width:2px;background:var(--border)"></div>
+                  <div style="width:36px;height:36px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center;flex-shrink:0;z-index:1"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" style="width:16px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
+                  <div><div style="font-size:13px;font-weight:700;margin-bottom:3px">1. Cliente abre solicitud</div><div style="font-size:11px;color:var(--text2)">Sistema valida VIN y garantía automáticamente.</div><div style="display:inline-flex;align-items:center;gap:4px;margin-top:6px;padding:3px 8px;border-radius:6px;font-size:10px;font-weight:700;background:var(--green-l);color:#15803D"><svg viewBox="0 0 24 24" fill="none" stroke="#15803D" stroke-width="2" style="width:10px"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>0–3 segundos · Automático</div></div>
+                </div>
+                <div style="display:flex;gap:14px;position:relative;padding-bottom:18px">
+                  <div style="position:absolute;left:18px;top:38px;bottom:0;width:2px;background:var(--border)"></div>
+                  <div style="width:36px;height:36px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;flex-shrink:0;z-index:1"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" style="width:16px"><path d="M9 11l3 3L22 4"/></svg></div>
+                  <div><div style="font-size:13px;font-weight:700;margin-bottom:3px">2. Validación de documentos</div><div style="font-size:11px;color:var(--text2)">Detecta campos faltantes y notifica al cliente.</div><div style="display:inline-flex;align-items:center;gap:4px;margin-top:6px;padding:3px 8px;border-radius:6px;font-size:10px;font-weight:700;background:var(--green-l);color:#15803D"><svg viewBox="0 0 24 24" fill="none" stroke="#15803D" stroke-width="2" style="width:10px"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>0–5 minutos · Automático</div></div>
+                </div>
+                <div style="display:flex;gap:14px;position:relative;padding-bottom:18px">
+                  <div style="position:absolute;left:18px;top:38px;bottom:0;width:2px;background:var(--border)"></div>
+                  <div style="width:36px;height:36px;border-radius:50%;background:var(--amber);display:flex;align-items:center;justify-content:center;flex-shrink:0;z-index:1"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" style="width:16px"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></div>
+                  <div><div style="font-size:13px;font-weight:700;margin-bottom:3px">3. Diagnóstico técnico físico</div><div style="font-size:11px;color:var(--text2)">El técnico tiene 48h para inspeccionar y emitir diagnóstico.</div><div style="display:inline-flex;align-items:center;gap:4px;margin-top:6px;padding:3px 8px;border-radius:6px;font-size:10px;font-weight:700;background:var(--amber-l);color:#92400E"><svg viewBox="0 0 24 24" fill="none" stroke="#92400E" stroke-width="2" style="width:10px"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>Máx. 48 horas · Humano</div><div style="display:inline-flex;align-items:center;gap:4px;margin-top:6px;margin-left:6px;padding:3px 8px;border-radius:6px;font-size:10px;font-weight:700;background:var(--red-l);color:#B91C1C;border:1px solid #FECACA;cursor:pointer" onclick="showToast('Regla: +48h sin diagnóstico → Supervisor notificado','err')"><svg viewBox="0 0 24 24" fill="none" stroke="#B91C1C" stroke-width="2" style="width:10px"><polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/></svg>Si +48h → escala al supervisor</div></div>
+                </div>
+                <div style="display:flex;gap:14px;position:relative;padding-bottom:18px">
+                  <div style="position:absolute;left:18px;top:38px;bottom:0;width:2px;background:var(--border)"></div>
+                  <div style="width:36px;height:36px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center;flex-shrink:0;z-index:1"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" style="width:16px"><path d="M3 21h18M3 7v14M21 7v14M9 21v-6h6v6M3 7l9-4 9 4"/></svg></div>
+                  <div><div style="font-size:13px;font-weight:700;margin-bottom:3px">4. Aprobación de la marca</div><div style="font-size:11px;color:var(--text2)">Nissan México revisa y autoriza en máximo 4 horas hábiles.</div><div style="display:inline-flex;align-items:center;gap:4px;margin-top:6px;padding:3px 8px;border-radius:6px;font-size:10px;font-weight:700;background:var(--amber-l);color:#92400E"><svg viewBox="0 0 24 24" fill="none" stroke="#92400E" stroke-width="2" style="width:10px"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>Máx. 4 horas · Humano</div></div>
+                </div>
+                <div style="display:flex;gap:14px;position:relative;padding-bottom:18px">
+                  <div style="position:absolute;left:18px;top:38px;bottom:0;width:2px;background:var(--border)"></div>
+                  <div style="width:36px;height:36px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;flex-shrink:0;z-index:1"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" style="width:16px"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div>
+                  <div><div style="font-size:13px;font-weight:700;margin-bottom:3px">5. Firma y cierre automático</div><div style="font-size:11px;color:var(--text2)">Firma digital → expediente PDF → archivado. 5–10 minutos.</div><div style="display:inline-flex;align-items:center;gap:4px;margin-top:6px;padding:3px 8px;border-radius:6px;font-size:10px;font-weight:700;background:var(--green-l);color:#15803D"><svg viewBox="0 0 24 24" fill="none" stroke="#15803D" stroke-width="2" style="width:10px"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>10 minutos · Automático</div></div>
+                </div>
+                <div style="display:flex;gap:14px">
+                  <div style="width:36px;height:36px;border-radius:50%;background:var(--red);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" style="width:16px"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/></svg></div>
+                  <div><div style="font-size:13px;font-weight:700;margin-bottom:3px">6. Disputa → Mediación formal</div><div style="font-size:11px;color:var(--text2)">Si el cliente rechaza en 72h, árbitro neutral asignado. Máx. 5 días hábiles.</div><div style="display:inline-flex;align-items:center;gap:4px;margin-top:6px;padding:3px 8px;border-radius:6px;font-size:10px;font-weight:700;background:var(--red-l);color:#B91C1C"><svg viewBox="0 0 24 24" fill="none" stroke="#B91C1C" stroke-width="2" style="width:10px"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>3–5 días hábiles · Árbitro</div></div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div class="card" style="margin-bottom:14px">
+                <div class="card-h"><div class="card-t">Tiempos y umbrales de escalamiento</div></div>
+                <table class="tbl">
+                  <thead><tr><th>Etapa</th><th>Tiempo máx.</th><th>Si se supera</th></tr></thead>
+                  <tbody>
+                    <tr><td><span class="bdg b-gr">Auto</span> Validación VIN</td><td style="font-weight:700;color:var(--green)">3 seg.</td><td style="font-size:11px">Reintento automático</td></tr>
+                    <tr><td><span class="bdg b-gr">Auto</span> Doc. incompletos</td><td style="font-weight:700;color:var(--green)">5 min.</td><td style="font-size:11px">Notif. multicanal</td></tr>
+                    <tr style="background:#FFFBEB"><td><span class="bdg b-am">Humano</span> Diagnóstico</td><td style="font-weight:700;color:var(--amber)">48 hrs.</td><td style="font-size:11px;color:var(--red);font-weight:600">→ Supervisor taller</td></tr>
+                    <tr style="background:#FFFBEB"><td><span class="bdg b-am">Humano</span> Aprobación marca</td><td style="font-weight:700;color:var(--amber)">4 hrs.</td><td style="font-size:11px;color:var(--red);font-weight:600">→ Gerente garantías</td></tr>
+                    <tr style="background:#FFFBEB"><td><span class="bdg b-am">Humano</span> Rechazo formal</td><td style="font-weight:700;color:var(--amber)">72 hrs.</td><td style="font-size:11px;color:var(--red);font-weight:600">→ Mediación</td></tr>
+                    <tr style="background:#F5F3FF"><td><span class="bdg b-pu">Árbitro</span> Mediación</td><td style="font-weight:700;color:var(--purple)">5 días</td><td style="font-size:11px;color:var(--red);font-weight:600">→ Instancia judicial</td></tr>
+                    <tr><td><span class="bdg b-gr">Auto</span> Cierre post-firma</td><td style="font-weight:700;color:var(--green)">10 min.</td><td style="font-size:11px">Reintento automático</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <div style="background:var(--green-l);border:1px solid #BBF7D0;border-radius:10px;padding:14px">
+                <div style="font-size:12px;font-weight:700;color:#15803D;margin-bottom:8px">✓ Distribución real de casos</div>
+                <div style="font-size:11px;color:#166534;line-height:1.8"><b>68%</b> se resuelven solos sin técnico<br><b>27%</b> requieren diagnóstico físico (48h máx.)<br><b>4%</b> escalan a la marca para aprobación<br><b>1%</b> llegan a mediación con árbitro</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ======= APP SHELL: MARCA ======= -->
+<div class="app-shell" id="app-marca">
+  <div class="role-bar marca">
+    <div class="rb-left"><svg viewBox="0 0 24 24"><path d="M3 21h18M3 7v14M21 7v14M9 21v-6h6v6M3 7l9-4 9 4"/></svg>GARANTÍA360 — Vista Marca / Fabricante · Nissan México</div>
+    <div class="rb-back" onclick="backToLanding()"><svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>Cambiar rol</div>
+  </div>
+  <div class="main-layout">
+    <aside class="sidebar marca">
+      <div class="sh"><div class="li"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg></div><div><div class="lt">GARANTÍA360</div><div class="ls">PANEL MARCA</div></div></div>
+      <div class="role-pill"><svg viewBox="0 0 24 24"><path d="M3 21h18M3 7v14M21 7v14M9 21v-6h6v6M3 7l9-4 9 4"/></svg><span>Marca / Fabricante</span></div>
+      <nav class="snav">
+        <div class="slbl">Ejecutivo</div>
+        <div class="ni on" data-page="m-dashboard" onclick="navM('m-dashboard',this)"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard Global</div>
+        <div class="ni" data-page="m-aprobaciones" onclick="navM('m-aprobaciones',this)"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Aprobaciones <span class="nb">8</span></div>
+        <div class="ni" data-page="m-escalamientos" onclick="navM('m-escalamientos',this)"><svg viewBox="0 0 24 24"><polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/></svg>Escalamientos <span class="nb" style="background:var(--amber)">4</span></div>
+        <div class="slbl">Red</div>
+        <div class="ni" data-page="m-distribuidores" onclick="navM('m-distribuidores',this)"><svg viewBox="0 0 24 24"><path d="M3 21h18M3 7v14M21 7v14M9 21v-6h6v6M3 7l9-4 9 4"/></svg>Distribuidores</div>
+        <div class="ni" data-page="m-campanas" onclick="navM('m-campanas',this)"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>Campañas <span class="nb" style="background:var(--amber)">2</span></div>
+        <div class="ni" data-page="m-reportes" onclick="navM('m-reportes',this)"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Reportes ejecutivos</div>
+      </nav>
+      <div class="sf"><div class="av av32 a-wh">GG</div><div><div class="uname">Gerente Garantías</div><div class="urole">Nissan México</div></div></div>
+    </aside>
+    <div class="content-area">
+      <div class="topbar">
+        <div class="bc">GARANTÍA360 › <span class="cur" id="bc-m">Dashboard Global</span></div>
+        <div class="ta">
+          <div class="ibtn" onclick="showToast('8 aprobaciones pendientes','err')"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span class="ndot"></span></div>
+          <button class="btn btn-p btn-sm" onclick="showToast('Reporte generado en PDF','suc')"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17,8 12,3 7,8"/></svg>Exportar reporte</button>
+        </div>
+      </div>
+      <div class="content-scroll">
+
+        <!-- MARCA DASHBOARD -->
+        <div class="page on" id="pg-m-dashboard">
+          <div class="ph"><div class="pt">Dashboard Ejecutivo — Nissan México</div><div class="ps">Red nacional de 47 distribuidores · Julio 2025</div></div>
+          <div class="g4">
+            <div class="mc"><div class="ml">Solicitudes totales (red)</div><div class="mv" style="color:var(--blue)">284</div><div class="mch up">↑ 18% vs mes anterior</div><div class="pb"><div class="pf pbl" style="width:71%"></div></div></div>
+            <div class="mc"><div class="ml">Tasa de aprobación</div><div class="mv" style="color:var(--green)">91%</div><div class="mch up">↑ 3% vs objetivo</div><div class="pb"><div class="pf pgr" style="width:91%"></div></div></div>
+            <div class="mc"><div class="ml">Costo garantías</div><div class="mv">$2.4M</div><div class="mch dn">↑ 12% — revisar lotes</div><div class="pb"><div class="pf pam" style="width:60%"></div></div></div>
+            <div class="mc"><div class="ml">NPS promedio red</div><div class="mv">87%</div><div class="mch up">↑ 4 puntos vs anterior</div><div class="pb"><div class="pf ptl" style="width:87%"></div></div></div>
+          </div>
+          <div class="g2">
+            <div class="card">
+              <div class="card-h"><div class="card-t">Aprobaciones pendientes</div><button class="btn btn-g btn-sm" onclick="navM('m-aprobaciones',document.querySelector('[data-page=m-aprobaciones]'))">Ver todas (8) →</button></div>
+              <div style="padding:12px">
+                <div class="case-card urg" onclick="navM('m-aprobaciones',document.querySelector('[data-page=m-aprobaciones]'))">
+                  <div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-family:monospace;font-size:11px;font-weight:700;color:var(--blue)">#GR-2471</span><span class="bdg b-rd">SLA: HOY</span></div>
+                  <div style="font-size:12px;font-weight:700;margin-bottom:3px">Defecto lote inyectores — Sentra 2023</div>
+                  <div style="font-size:11px;color:var(--text2)">Nissan Satélite · $8,440 · Cob. 100%</div>
+                </div>
+                <div class="case-card norm" onclick="navM('m-aprobaciones',document.querySelector('[data-page=m-aprobaciones]'))">
+                  <div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-family:monospace;font-size:11px;font-weight:700;color:var(--blue)">#GR-2468</span><span class="bdg b-am">2 días SLA</span></div>
+                  <div style="font-size:12px;font-weight:700;margin-bottom:3px">ABS — Kicks 2022</div>
+                  <div style="font-size:11px;color:var(--text2)">Centro Norte · $4,200 · Cob. 80%</div>
+                </div>
+              </div>
+            </div>
+            <div class="card card-p">
+              <div style="font-size:13px;font-weight:700;margin-bottom:12px">Actividad de la red</div>
+              <div class="tl">
+                <div class="tli"><div class="tld rd"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/></svg></div><div class="tlb"><div class="tlt">Alerta lote defectuoso</div><div class="tld2">12 Sentra 2023 — Inyectores Denso Ene-Mar</div><div class="tltm">Hoy 08:00</div></div></div>
+                <div class="tli"><div class="tld gr"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/></svg></div><div class="tlb"><div class="tlt">Campaña CS-2025-07 autorizada</div><div class="tld2">47 distribuidores notificados</div><div class="tltm">Ayer 16:30</div></div></div>
+                <div class="tli"><div class="tld bl"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div><div class="tlb"><div class="tlt">NPS mensual: 87%</div><div class="tld2">Mejor resultado del año</div><div class="tltm">1 Jul 2025</div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- APROBACIONES -->
+        <div class="page" id="pg-m-aprobaciones">
+          <div class="ph"><div class="pt">Aprobaciones Pendientes</div><div class="ps">8 solicitudes requieren autorización</div></div>
+          <div class="g21">
+            <div>
+              <div class="case-card urg" style="background:#fff;border:1px solid var(--border)">
+                <div style="display:flex;justify-content:space-between;margin-bottom:10px"><div><span style="font-family:monospace;font-size:13px;font-weight:700;color:var(--blue)">#GR-2471</span><span class="bdg b-rd" style="margin-left:8px">SLA: HOY 18:00</span></div><span class="bdg b-am">En diagnóstico</span></div>
+                <div style="font-size:14px;font-weight:700;margin-bottom:5px">Falla inyectores — Nissan Sentra 2023</div>
+                <div style="font-size:11px;color:var(--text2);margin-bottom:12px">Nissan Satélite · Rodrigo Sánchez · Carlos Mendoza</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px">
+                  <div style="text-align:center;padding:10px;background:var(--gray);border-radius:8px"><div style="font-size:10px;color:var(--text2)">Monto</div><div style="font-size:14px;font-weight:800;color:var(--blue)">$8,440</div></div>
+                  <div style="text-align:center;padding:10px;background:var(--gray);border-radius:8px"><div style="font-size:10px;color:var(--text2)">Cobertura</div><div style="font-size:14px;font-weight:800;color:var(--green)">100%</div></div>
+                  <div style="text-align:center;padding:10px;background:var(--gray);border-radius:8px"><div style="font-size:10px;color:var(--text2)">Causa</div><div style="font-size:12px;font-weight:700">Defecto fab.</div></div>
+                </div>
+                <div style="background:var(--red-l);border-radius:8px;padding:10px;font-size:11px;color:#B91C1C;margin-bottom:12px"><strong>⚠ Alerta:</strong> Lote Ene-Mar 2023 tiene 12 casos esta semana. Posible campaña necesaria.</div>
+                <div style="display:flex;gap:8px">
+                  <button class="btn btn-err btn-sm" style="flex:1;justify-content:center" onclick="showToast('Caso rechazado — notificado al distribuidor','err')">Rechazar</button>
+                  <button class="btn btn-s btn-sm" style="flex:1;justify-content:center" onclick="navM('m-campanas',document.querySelector('[data-page=m-campanas]'))">Ver campaña</button>
+                  <button class="btn btn-suc btn-sm" style="flex:1;justify-content:center" onclick="showToast('✓ Garantía #GR-2471 aprobada! Distribuidor notificado','suc')"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/></svg>Aprobar</button>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div class="card card-p">
+                <div style="font-size:13px;font-weight:700;margin-bottom:10px">Resumen</div>
+                <div class="krow"><span class="kn">Pendientes hoy</span><span class="kv" style="color:var(--amber)">8</span></div>
+                <div class="krow"><span class="kn">Aprobadas este mes</span><span class="kv" style="color:var(--green)">258</span></div>
+                <div class="krow"><span class="kn">Monto aprobado</span><span class="kv">$2.4M</span></div>
+                <div class="krow"><span class="kn">Tiempo prom. respuesta</span><span class="kv">4.2 hrs</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ESCALAMIENTOS -->
+        <div class="page" id="pg-m-escalamientos">
+          <div class="ph"><div class="pt">Escalamientos</div><div class="ps">4 casos que requieren intervención directa</div></div>
+          <div class="card">
+            <table class="tbl"><thead><tr><th>ID</th><th>Distribuidor</th><th>Motivo</th><th>SLA</th><th>Prioridad</th><th>Acciones</th></tr></thead><tbody>
+              <tr><td><b style="color:var(--blue);font-family:monospace">#GR-2471</b></td><td>Nissan Satélite</td><td>Lote defectuoso</td><td><span style="color:var(--red);font-weight:700">HOY</span></td><td><span class="bdg b-rd">Crítico</span></td><td><button class="btn btn-p btn-sm" onclick="showToast('#GR-2471 resuelto — cobertura aprobada','suc')">Resolver</button></td></tr>
+              <tr><td><b style="color:var(--blue);font-family:monospace">#GR-2468</b></td><td>Centro Norte</td><td>Backorder piezas</td><td><span style="color:var(--amber);font-weight:700">2 días</span></td><td><span class="bdg b-am">Urgente</span></td><td><button class="btn btn-s btn-sm">Ver</button></td></tr>
+              <tr><td><b style="color:var(--blue);font-family:monospace">#GR-2450</b></td><td>Polanco</td><td>Cliente inconforme</td><td><span style="color:var(--amber);font-weight:700">3 días</span></td><td><span class="bdg b-am">Urgente</span></td><td><button class="btn btn-s btn-sm" onclick="showToast('Sala de mediación abierta','')">Mediar</button></td></tr>
+              <tr><td><b style="color:var(--blue);font-family:monospace">#GR-2445</b></td><td>Periférico Norte</td><td>Recurrencia falla</td><td><span style="color:var(--green);font-weight:700">4 días</span></td><td><span class="bdg b-bl">Normal</span></td><td><button class="btn btn-s btn-sm">Ver</button></td></tr>
+            </tbody></table>
+          </div>
+        </div>
+
+        <!-- DISTRIBUIDORES -->
+        <div class="page" id="pg-m-distribuidores">
+          <div class="ph"><div class="pt">Red de Distribuidores</div><div class="ps">47 distribuidores autorizados — Nacional</div></div>
+          <div class="g2">
+            <div class="card">
+              <div class="card-h"><div class="card-t">Ranking NPS</div></div>
+              <div style="padding:12px">
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:10px;border-bottom:1px solid var(--border);background:linear-gradient(90deg,#F0FFF4,transparent);border-radius:8px;margin-bottom:6px">
+                  <div><div style="font-size:12px;font-weight:700">#1 Nissan Satélite — Edo. Mex.</div><div style="font-size:10px;color:var(--text2)">12 casos activos · 8 técnicos</div></div>
+                  <div style="display:flex;align-items:center;gap:8px"><div class="spark"><div class="bar-s" style="height:8px;background:#E5E7EB"></div><div class="bar-s" style="height:12px;background:var(--green)"></div><div class="bar-s" style="height:16px;background:var(--green)"></div><div class="bar-s" style="height:20px;background:var(--green)"></div><div class="bar-s" style="height:22px;background:var(--green)"></div></div><span class="bdg b-gr">NPS 94</span></div>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border)"><div><div style="font-size:12px;font-weight:700">#2 Nissan Insurgentes</div><div style="font-size:10px;color:var(--text2)">9 casos activos</div></div><span class="bdg b-gr">NPS 89</span></div>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border)"><div><div style="font-size:12px;font-weight:700">#3 Nissan Centro CDMX</div><div style="font-size:10px;color:var(--text2)">7 casos activos</div></div><span class="bdg b-am">NPS 78</span></div>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 0"><div><div style="font-size:12px;font-weight:700;color:var(--red)">#5 Nissan Polanco ⚠</div><div style="font-size:10px;color:var(--text2)">Atención requerida</div></div><span class="bdg b-rd">NPS 61</span></div>
+              </div>
+            </div>
+            <div>
+              <div class="card card-p" style="margin-bottom:12px">
+                <div style="font-size:13px;font-weight:700;margin-bottom:10px">Estadísticas de red</div>
+                <div class="krow"><span class="kn">Total distribuidores</span><span class="kv">47</span></div>
+                <div class="krow"><span class="kn">NPS promedio</span><span class="kv" style="color:var(--green)">87</span></div>
+                <div class="krow"><span class="kn">Técnicos certificados</span><span class="kv">284</span></div>
+                <div class="krow"><span class="kn">Requieren atención</span><span class="kv" style="color:var(--red)">5</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CAMPAÑAS -->
+        <div class="page" id="pg-m-campanas">
+          <div class="ph" style="display:flex;justify-content:space-between;align-items:center"><div><div class="pt">Campañas de Servicio</div><div class="ps">Gestión de recalls y acciones preventivas</div></div><button class="btn btn-p" onclick="showToast('Nueva campaña creada','suc')">+ Nueva campaña</button></div>
+          <div class="g2">
+            <div>
+              <div class="card card-p" style="margin-bottom:14px;border-left:3px solid var(--red)">
+                <div style="display:flex;justify-content:space-between;margin-bottom:10px"><div><div style="font-size:14px;font-weight:700">CS-2025-07 — Inyectores Sentra 2023</div><div style="font-size:11px;color:var(--text2)">Denso IFR6E11 · Ene-Mar 2023</div></div><span class="bdg b-rd">Activa</span></div>
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px">
+                  <div style="text-align:center;padding:10px;background:var(--gray);border-radius:8px"><div style="font-size:10px;color:var(--text2)">Afectados</div><div style="font-size:15px;font-weight:800;color:var(--red)">1,247</div></div>
+                  <div style="text-align:center;padding:10px;background:var(--gray);border-radius:8px"><div style="font-size:10px;color:var(--text2)">Resueltos</div><div style="font-size:15px;font-weight:800;color:var(--green)">834</div></div>
+                  <div style="text-align:center;padding:10px;background:var(--gray);border-radius:8px"><div style="font-size:10px;color:var(--text2)">Pendientes</div><div style="font-size:15px;font-weight:800;color:var(--amber)">413</div></div>
+                </div>
+                <div style="margin-bottom:8px"><div style="font-size:10px;color:var(--text2);margin-bottom:4px">Progreso 67%</div><div class="pb" style="height:8px"><div class="pf pgr" style="width:67%"></div></div></div>
+                <div style="display:flex;gap:8px"><button class="btn btn-s btn-sm" onclick="showToast('413 propietarios notificados','suc')">Notificar pendientes</button><button class="btn btn-p btn-sm" onclick="showToast('Reporte generado','suc')">Reporte</button></div>
+              </div>
+            </div>
+            <div>
+              <div class="card card-p">
+                <div style="font-size:13px;font-weight:700;margin-bottom:10px">Impacto financiero</div>
+                <div class="krow"><span class="kn">Costo CS-2025-07</span><span class="kv" style="color:var(--red)">$10.5M</span></div>
+                <div class="krow"><span class="kn">Litigios evitados (est.)</span><span class="kv" style="color:var(--green)">$48M</span></div>
+                <div class="krow"><span class="kn">ROI plataforma ODR</span><span class="kv" style="color:var(--green)">+251%</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- REPORTES -->
+        <div class="page" id="pg-m-reportes">
+          <div class="ph" style="display:flex;justify-content:space-between;align-items:center"><div><div class="pt">Reportes Ejecutivos</div><div class="ps">KPIs para el Consejo Directivo</div></div><div style="display:flex;gap:8px"><button class="btn btn-s btn-sm" onclick="showToast('PDF generado','suc')">PDF</button><button class="btn btn-p btn-sm" onclick="showToast('Presentación generada','suc')">Presentación</button></div></div>
+          <div class="g4" style="margin-bottom:16px">
+            <div class="mc"><div class="ml">Reducción de litigios</div><div class="mv" style="color:var(--green)">↓78%</div><div class="mch up">vs período sin ODR</div></div>
+            <div class="mc"><div class="ml">Tiempo resolución</div><div class="mv">4.2 <span style="font-size:13px;color:var(--text2)">días</span></div><div class="mch up">vs 45 días anterior</div></div>
+            <div class="mc"><div class="ml">Satisfacción NPS</div><div class="mv" style="color:var(--blue)">87%</div><div class="mch up">↑ 31 puntos</div></div>
+            <div class="mc"><div class="ml">ROI plataforma</div><div class="mv" style="color:var(--green)">+251%</div><div class="mch up">$48M litigios evitados</div></div>
+          </div>
+          <div class="g2">
+            <div class="card card-p">
+              <div style="font-size:13px;font-weight:700;margin-bottom:12px">Impacto financiero 2025</div>
+              <div class="krow"><span class="kn">Garantías pagadas</span><span class="kv">$28.4M</span></div>
+              <div class="krow"><span class="kn">Litigios evitados</span><span class="kv" style="color:var(--green)">$48.0M</span></div>
+              <div class="krow"><span class="kn">Costo plataforma ODR</span><span class="kv">$1.2M</span></div>
+              <div class="krow"><span class="kn">Ahorro neto</span><span class="kv" style="color:var(--green);font-size:16px;font-weight:800">$18.4M</span></div>
+            </div>
+            <div class="card card-p">
+              <div style="font-size:13px;font-weight:700;margin-bottom:12px">KPIs ODR</div>
+              <div class="mbar"><span style="font-size:11px;color:var(--text2);width:120px">Tasa resolución</span><div class="mbt"><div class="mbf pgr" style="width:91%"></div></div><span class="mbv" style="color:var(--green)">91%</span></div>
+              <div class="mbar"><span style="font-size:11px;color:var(--text2);width:120px">Satisfacción NPS</span><div class="mbt"><div class="mbf pbl" style="width:87%"></div></div><span class="mbv">87%</span></div>
+              <div class="mbar"><span style="font-size:11px;color:var(--text2);width:120px">SLA cumplido</span><div class="mbt"><div class="mbf pgr" style="width:96%"></div></div><span class="mbv">96%</span></div>
+              <div class="mbar"><span style="font-size:11px;color:var(--text2);width:120px">Uptime sistema</span><div class="mbt"><div class="mbf pgr" style="width:99%"></div></div><span class="mbv" style="color:var(--green)">99.7%</span></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <div class="mh"><div class="mt">Confirmar envío de solicitud</div><button class="xbtn" onclick="closeModal()">×</button></div>
+    <div class="mb-body">
+      <div style="background:var(--gray);border-radius:9px;padding:14px;margin-bottom:14px">
+        <div class="iro"><span class="il">Vehículo</span><span class="iv">Nissan Sentra 2023</span></div>
+        <div class="iro"><span class="il">Categoría</span><span class="iv">Motor y transmisión</span></div>
+        <div class="iro"><span class="il">Taller</span><span class="iv">Nissan Satélite</span></div>
+        <div class="iro"><span class="il">Archivos</span><span class="iv">2 adjuntos</span></div>
+      </div>
+      <div style="font-size:12px;color:var(--text2)">El taller recibirá notificación inmediata y tendrá <strong>3 días hábiles</strong> para responder.</div>
+    </div>
+    <div class="mf"><button class="btn btn-s" onclick="closeModal()">Cancelar</button><button class="btn btn-p" onclick="sendReq()">Enviar solicitud <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toastEl"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/></svg><span id="toastTxt"></span></div>
+
+<script>
+var cSigned=false;
+
+// LAUNCH
+function launchApp(role){
+  document.getElementById('landing').style.display='none';
+  if(role==='consumer'){document.getElementById('app-consumer').classList.add('on')}
+  else if(role==='taller'){document.getElementById('app-taller').classList.add('on')}
+  else if(role==='marca'){document.getElementById('app-marca').classList.add('on')}
+}
+function launchSpecial(type){
+  showToast('Abriendo módulo: '+type+'... (disponible en la versión interactiva completa)','');
+}
+function backToLanding(){
+  document.querySelectorAll('.app-shell').forEach(function(a){a.classList.remove('on')});
+  document.getElementById('landing').style.display='flex';
+}
+
+// NAV CONSUMER
+function navC(id,el){
+  document.querySelectorAll('#app-consumer .page').forEach(function(p){p.classList.remove('on')});
+  var p=document.getElementById('pg-'+id);if(p)p.classList.add('on');
+  document.querySelectorAll('#app-consumer .ni').forEach(function(n){n.classList.remove('on')});
+  if(el)el.classList.add('on');
+  var labels={
+    'c-dashboard':'Dashboard','c-solicitudes':'Solicitudes','c-nueva':'Nueva Solicitud',
+    'c-seguimiento':'Seguimiento — #GR-2471','c-chat':'Chat','c-resolucion':'Resolución',
+    'c-vehiculos':'Mis Vehículos','c-historial':'Historial','c-perfil':'Mi Perfil'
+  };
+  document.getElementById('bc-c').textContent=labels[id]||id;
+}
+
+// NAV TALLER
+function navT(id,el){
+  document.querySelectorAll('#app-taller .page').forEach(function(p){p.classList.remove('on')});
+  var p=document.getElementById('pg-'+id);if(p)p.classList.add('on');
+  document.querySelectorAll('#app-taller .ni').forEach(function(n){n.classList.remove('on')});
+  if(el)el.classList.add('on');
+  var labels={
+    't-dashboard':'Dashboard','t-casos':'Casos asignados','t-diagnostico':'Diagnóstico — #GR-2471',
+    't-cotizacion':'Cotización','t-chat':'Chat con clientes','t-rendimiento':'Mi rendimiento',
+    't-auto':'Casos automáticos vs humanos','t-monitor':'Monitor SLA en tiempo real','t-flujo':'Flujo de escalamiento'
+  };
+  document.getElementById('bc-t').textContent=labels[id]||id;
+}
+
+// NAV MARCA
+function navM(id,el){
+  document.querySelectorAll('#app-marca .page').forEach(function(p){p.classList.remove('on')});
+  var p=document.getElementById('pg-'+id);if(p)p.classList.add('on');
+  document.querySelectorAll('#app-marca .ni').forEach(function(n){n.classList.remove('on')});
+  if(el)el.classList.add('on');
+  var labels={
+    'm-dashboard':'Dashboard Global','m-aprobaciones':'Aprobaciones pendientes',
+    'm-escalamientos':'Escalamientos','m-distribuidores':'Red de distribuidores',
+    'm-campanas':'Campañas de servicio','m-reportes':'Reportes ejecutivos'
+  };
+  document.getElementById('bc-m').textContent=labels[id]||id;
+}
+
+// MODAL
+function openModal(){document.getElementById('modal').classList.add('open')}
+function closeModal(){document.getElementById('modal').classList.remove('open')}
+function sendReq(){
+  closeModal();
+  showToast('Solicitud #GR-2472 enviada exitosamente','suc');
+  setTimeout(function(){navC('c-seguimiento',document.querySelector('[data-page=c-seguimiento]'))},1200);
+}
+
+// TOAST
+function showToast(msg,type){
+  var t=document.getElementById('toastEl');
+  t.className='toast'+(type?' '+type:'');
+  document.getElementById('toastTxt').textContent=msg;
+  t.classList.add('show');
+  setTimeout(function(){t.classList.remove('show')},3200);
+}
+
+// CHAT CONSUMER
+function sendChatC(e){if(e.key==='Enter')sendChatCBtn()}
+function sendChatCBtn(){
+  var inp=document.getElementById('chatInputC');var msg=inp.value.trim();if(!msg)return;
+  var msgs=document.getElementById('chatMsgsC');
+  var d=document.createElement('div');d.className='msg me';
+  d.innerHTML='<div><div class="mb2">'+msg+'</div><div class="mm">Yo · Ahora · ✓</div></div><div class="av av26 a-bl" style="flex-shrink:0">CM</div>';
+  msgs.appendChild(d);msgs.scrollTop=msgs.scrollHeight;inp.value='';
+  setTimeout(function(){
+    var r=document.createElement('div');r.className='msg ot';
+    r.innerHTML='<div class="av av26 a-am" style="flex-shrink:0">RS</div><div><div class="mb2">Recibido, te respondo en breve.</div><div class="mm">Rodrigo · Ahora · ✓✓</div></div>';
+    msgs.appendChild(r);msgs.scrollTop=msgs.scrollHeight;
+  },1200);
+}
+
+// CHAT TALLER
+function sendChatT(e){if(e.key==='Enter')sendChatTBtn()}
+function sendChatTBtn(){
+  var inp=document.getElementById('chatInputT');var msg=inp.value.trim();if(!msg)return;
+  var msgs=document.getElementById('chatMsgsT');
+  var d=document.createElement('div');d.className='msg me';
+  d.innerHTML='<div><div class="mb2" style="background:var(--amber);color:#fff">'+msg+'</div><div class="mm">RS · Ahora · ✓</div></div><div class="av av26 a-am" style="flex-shrink:0">RS</div>';
+  msgs.appendChild(d);msgs.scrollTop=msgs.scrollHeight;inp.value='';
+}
+
+// FIRMA CONSUMER
+function doSignC(){
+  if(cSigned)return;cSigned=true;
+  var box=document.getElementById('signBoxC');box.classList.add('signed');
+  document.getElementById('signContentC').innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="#15803D" stroke-width="2.5" style="width:24px;margin:0 auto 6px"><path d="M9 11l3 3L22 4"/></svg><div style="font-size:12px;font-weight:700;color:#15803D">Firmado digitalmente ✓</div><div style="font-size:10px;color:#166534">Carlos Mendoza · '+new Date().toLocaleString('es-MX')+'</div>';
+  showToast('Firma electrónica registrada — NOM-151','suc');
+}
+function acceptResC(){
+  if(!cSigned){showToast('Firma primero el acuerdo','err');return;}
+  showToast('🎉 ¡Garantía ejecutada! Reporte enviado por correo','suc');
+  setTimeout(function(){navC('c-historial',document.querySelector('[data-page=c-historial]'))},1800);
+}
+
+// RATING
+function rateC(n){
+  document.querySelectorAll('.star').forEach(function(s,i){s.classList.toggle('on',i<n)});
+  showToast('Calificación de '+n+' ⭐ registrada','suc');
+}
+</script>
+</body>
+</html>
