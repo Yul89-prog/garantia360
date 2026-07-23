@@ -515,7 +515,29 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
               </div>
               <div class="card card-p">
                 <div style="font-size:13px;font-weight:700;margin-bottom:12px">Detalle de la solicitud</div>
-                <div class="frow c2"><div><label class="lbl">Categoría</label><select class="inp"><option>Motor y transmisión</option><option>Sistema eléctrico</option><option>Frenos</option><option>A/C</option></select></div><div><label class="lbl">Taller</label><select class="inp"><option>Nissan Satélite</option><option>Nissan Centro CDMX</option></select></div></div>
+                <div class="frow c2"><div><label class="lbl">Categoría</label><select class="inp" id="form-categoria" onchange="updateCategoriaTag()">
+                        <optgroup label="🔴 CRÍTICO — Humano directo">
+                          <option value="rojo">Frenos / Sistema de frenado</option>
+                          <option value="rojo">Dirección / Volante</option>
+                          <option value="rojo">Motor apagado en marcha</option>
+                          <option value="rojo">Airbags / Sistemas de seguridad</option>
+                        </optgroup>
+                        <optgroup label="🟡 MEDIO — Negociación automática">
+                          <option value="amarillo">Aire acondicionado</option>
+                          <option value="amarillo">Suspensión / Ruidos</option>
+                          <option value="amarillo">Pintura / Acabados</option>
+                          <option value="amarillo">Demoras en piezas / Repuestos</option>
+                          <option value="amarillo">Sistema eléctrico</option>
+                          <option value="amarillo">Motor y transmisión</option>
+                        </optgroup>
+                        <optgroup label="🟢 BAJO — Auto resolución">
+                          <option value="verde">Consulta de cobertura de garantía</option>
+                          <option value="verde">Descontento con costo de revisiones</option>
+                          <option value="verde">Cláusulas de exclusión / Manual</option>
+                          <option value="verde">Cobro indebido por revisión preventiva</option>
+                        </optgroup>
+                      </select>
+                      <div id="categoria-tag" style="margin-top:6px;display:none"></div></div><div><label class="lbl">Taller</label><select class="inp"><option>Nissan Satélite</option><option>Nissan Centro CDMX</option></select></div></div>
                 <div style="margin-bottom:12px"><label class="lbl">Descripción del problema</label><textarea class="inp" style="min-height:85px;resize:vertical">Vibración excesiva al arrancar en frío. Luz Check Engine encendida desde el 5 de julio. Falla intermitente al acelerar.</textarea></div>
                 <div class="frow c2"><div><label class="lbl">Fecha del incidente</label><input class="inp" value="05 Jul 2025"></div><div><label class="lbl">Kilometraje</label><input class="inp" type="number" value="48200"></div></div>
                 <div style="margin-bottom:12px"><label class="lbl">Evidencia adjunta</label>
@@ -883,6 +905,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
         <div class="ni" data-page="t-cotizacion" onclick="navT('t-cotizacion',this)"><svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Cotización</div>
         <div class="slbl">Comunicación</div>
         <div class="ni" data-page="t-chat" onclick="navT('t-chat',this)"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Chat con cliente <span class="nb">3</span></div>
+        <div class="slbl">Simulador</div>
+        <div class="ni" data-page="t-simulador" onclick="navT('t-simulador',this)" style="font-weight:700"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>Simulador de casos <span class="nb" style="background:var(--purple)">★</span></div>
         <div class="slbl">Historial</div>
         <div class="ni" data-page="t-rendimiento" onclick="navT('t-rendimiento',this)"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Mi rendimiento</div>
         <div class="slbl">Automatización</div>
@@ -1053,6 +1077,90 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
           </div>
         </div>
 
+
+        <!-- TALLER SIMULADOR -->
+        <div class="page" id="pg-t-simulador">
+          <div class="ph"><div class="pt">Simulador de casos — Vista Taller</div><div class="ps">Selecciona un caso y observa paso a paso qué llega al taller y cómo actúas</div></div>
+          <div style="margin-bottom:12px;padding:12px 14px;background:var(--amber-l);border:1px solid #FDE68A;border-radius:10px;font-size:12px;color:#92400E">
+            <strong>¿Qué casos llegan al taller?</strong> — 🟢 Bajo: notificación informativa (chatbot ya resolvió). 🟡 Medio: diagnóstico + cotización en 48h. 🔴 Crítico: alerta de emergencia, la marca decide.
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px" id="tsim-selector">
+            <div onclick="tsimStart('verde')" style="cursor:pointer;border-radius:12px;border:2px solid #BBF7D0;background:#fff;padding:16px;text-align:center" class="sim-case-btn">
+              <div style="font-size:28px;margin-bottom:8px">🟢</div>
+              <div style="font-size:13px;font-weight:700;color:#15803D;margin-bottom:4px">Caso BAJO</div>
+              <div style="font-size:11px;color:var(--text2);margin-bottom:8px">Consulta de cobertura — notificación informativa</div>
+              <div style="margin-top:10px;padding:6px 12px;background:var(--green);color:#fff;border-radius:7px;font-size:11px;font-weight:700">Ver qué pasa →</div>
+            </div>
+            <div onclick="tsimStart('amarillo')" style="cursor:pointer;border-radius:12px;border:2px solid #FDE68A;background:#fff;padding:16px;text-align:center" class="sim-case-btn">
+              <div style="font-size:28px;margin-bottom:8px">🟡</div>
+              <div style="font-size:13px;font-weight:700;color:#92400E;margin-bottom:4px">Caso MEDIO</div>
+              <div style="font-size:11px;color:var(--text2);margin-bottom:8px">Falla de A/C — diagnóstico + cotización + aprobación</div>
+              <div style="margin-top:10px;padding:6px 12px;background:var(--amber);color:#fff;border-radius:7px;font-size:11px;font-weight:700">Ver qué pasa →</div>
+            </div>
+            <div onclick="tsimStart('rojo')" style="cursor:pointer;border-radius:12px;border:2px solid #FECACA;background:#fff;padding:16px;text-align:center" class="sim-case-btn">
+              <div style="font-size:28px;margin-bottom:8px">🔴</div>
+              <div style="font-size:13px;font-weight:700;color:#B91C1C;margin-bottom:4px">Caso CRÍTICO</div>
+              <div style="font-size:11px;color:var(--text2);margin-bottom:8px">Falla de frenos — alerta emergencia, marca decide</div>
+              <div style="margin-top:10px;padding:6px 12px;background:var(--red);color:#fff;border-radius:7px;font-size:11px;font-weight:700">Ver qué pasa →</div>
+            </div>
+          </div>
+          <div id="tsim-panel" style="display:none">
+            <div id="tsim-header" style="border-radius:12px;padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between">
+              <div style="display:flex;align-items:center;gap:12px">
+                <span id="tsim-emoji" style="font-size:28px"></span>
+                <div><div id="tsim-title" style="font-size:15px;font-weight:800"></div><div id="tsim-subtitle" style="font-size:11px;margin-top:2px"></div></div>
+              </div>
+              <div style="display:flex;align-items:center;gap:12px">
+                <div style="background:rgba(255,255,255,.9);border-radius:10px;padding:8px 16px;text-align:center;min-width:90px">
+                  <div style="font-size:10px;font-weight:600;color:var(--text2);margin-bottom:2px">TIEMPO</div>
+                  <div id="tsim-timer" style="font-size:22px;font-weight:800;font-family:monospace;color:var(--text)">Día 0</div>
+                  <div id="tsim-timer-sub" style="font-size:9px;color:var(--text2)">Inicio</div>
+                </div>
+                <button onclick="tsimReset()" style="padding:6px 12px;border-radius:7px;border:1px solid rgba(255,255,255,.5);background:rgba(255,255,255,.2);color:#fff;font-size:11px;font-weight:600;cursor:pointer">↩ Cambiar caso</button>
+              </div>
+            </div>
+            <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:14px;margin-bottom:14px">
+              <div style="border-radius:10px;border:2px solid #FDE68A;overflow:hidden">
+                <div style="padding:10px 14px;background:#92400E;display:flex;align-items:center;gap:8px">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" style="width:14px"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+                  <span style="font-size:11px;font-weight:700;color:#fff">TALLER — Tu panel</span>
+                  <span id="tsim-t-status" style="margin-left:auto;font-size:9px;font-weight:700;padding:2px 8px;border-radius:10px;background:rgba(255,255,255,.2);color:#fff">En espera</span>
+                </div>
+                <div id="tsim-t-feed" style="padding:12px;min-height:320px;background:#fff;overflow-y:auto;display:flex;flex-direction:column;gap:8px">
+                  <div style="text-align:center;padding:40px 10px;color:var(--text3);font-size:11px">Selecciona un caso</div>
+                </div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:10px">
+                <div style="border-radius:10px;border:1.5px solid var(--border);overflow:hidden;flex:1">
+                  <div style="padding:8px 12px;background:var(--blue);display:flex;align-items:center;gap:7px">
+                    <span style="font-size:10px;font-weight:700;color:#fff">CONSUMIDOR ve...</span>
+                    <span id="tsim-c-status" style="margin-left:auto;font-size:9px;padding:1px 6px;border-radius:8px;background:rgba(255,255,255,.2);color:#fff">Esperando</span>
+                  </div>
+                  <div id="tsim-c-feed" style="padding:8px;min-height:140px;background:#fff;overflow-y:auto;display:flex;flex-direction:column;gap:6px">
+                    <div style="text-align:center;padding:20px 8px;color:var(--text3);font-size:10px">Sin actividad</div>
+                  </div>
+                </div>
+                <div style="border-radius:10px;border:1.5px solid var(--border);overflow:hidden;flex:1">
+                  <div style="padding:8px 12px;background:#0A1628;display:flex;align-items:center;gap:7px">
+                    <span style="font-size:10px;font-weight:700;color:#fff">MARCA ve...</span>
+                    <span id="tsim-m-status" style="margin-left:auto;font-size:9px;padding:1px 6px;border-radius:8px;background:rgba(255,255,255,.1);color:#fff">En espera</span>
+                  </div>
+                  <div id="tsim-m-feed" style="padding:8px;min-height:140px;background:#fff;overflow-y:auto;display:flex;flex-direction:column;gap:6px">
+                    <div style="text-align:center;padding:20px 8px;color:var(--text3);font-size:10px">Sin actividad</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="card card-p">
+              <div style="font-size:12px;font-weight:700;margin-bottom:12px;display:flex;justify-content:space-between"><span>Progreso</span><span id="tsim-step-label" style="font-size:11px;color:var(--text2)">Paso 1</span></div>
+              <div style="display:flex;align-items:center" id="tsim-steps-row"></div>
+              <div style="margin-top:14px;display:flex;align-items:center;gap:10px">
+                <button id="tsim-btn-next" onclick="tsimNext()" style="padding:8px 20px;border-radius:8px;background:#92400E;color:#fff;font-size:12px;font-weight:700;border:none;cursor:pointer">▶ Avanzar</button>
+                <span id="tsim-btn-hint" style="font-size:11px;color:var(--text2)">Haz clic para ver qué pasa a continuación</span>
+              </div>
+            </div>
+          </div>
+        </div>
         <!-- AUTO VS HUMANO PAGE -->
         <div class="page" id="pg-t-auto">
           <div class="ph"><div class="pt">Matriz de Riesgo y Complejidad</div><div class="ps">Algoritmo de enrutamiento automático — basado en el nivel de riesgo del caso</div></div>
@@ -1317,6 +1425,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
         <div class="ni" data-page="m-distribuidores" onclick="navM('m-distribuidores',this)"><svg viewBox="0 0 24 24"><path d="M3 21h18M3 7v14M21 7v14M9 21v-6h6v6M3 7l9-4 9 4"/></svg>Distribuidores</div>
         <div class="ni" data-page="m-campanas" onclick="navM('m-campanas',this)"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>Campañas <span class="nb" style="background:var(--amber)">2</span></div>
         <div class="ni" data-page="m-reportes" onclick="navM('m-reportes',this)"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Reportes ejecutivos</div>
+        <div class="slbl">Simulador</div>
+        <div class="ni" data-page="m-simulador" onclick="navM('m-simulador',this)" style="font-weight:700"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>Simulador de casos <span class="nb" style="background:var(--purple)">★</span></div>
       </nav>
       <div class="sf"><div class="av av32 a-wh">GG</div><div><div class="uname">Gerente Garantías</div><div class="urole">Nissan México</div></div></div>
     </aside>
@@ -1495,6 +1605,90 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
           </div>
         </div>
 
+
+        <!-- MARCA SIMULADOR -->
+        <div class="page" id="pg-m-simulador">
+          <div class="ph"><div class="pt">Simulador de casos — Vista Marca</div><div class="ps">Selecciona un caso y observa qué llega a la marca y cómo actúa</div></div>
+          <div style="margin-bottom:12px;padding:12px 14px;background:var(--blue-l);border:1px solid #BFDBFE;border-radius:10px;font-size:12px;color:#1E40AF">
+            <strong>¿Qué casos llegan a la marca?</strong> — 🟢 Bajo: solo registro (chatbot resuelve). 🟡 Medio: aprueba cotización en 4h. 🔴 Crítico: jurídico y gerencia actúan de inmediato.
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px" id="msim-selector">
+            <div onclick="msimStart('verde')" style="cursor:pointer;border-radius:12px;border:2px solid #BBF7D0;background:#fff;padding:16px;text-align:center" class="sim-case-btn">
+              <div style="font-size:28px;margin-bottom:8px">🟢</div>
+              <div style="font-size:13px;font-weight:700;color:#15803D;margin-bottom:4px">Caso BAJO</div>
+              <div style="font-size:11px;color:var(--text2);margin-bottom:8px">La marca NO interviene — solo registro</div>
+              <div style="margin-top:10px;padding:6px 12px;background:var(--green);color:#fff;border-radius:7px;font-size:11px;font-weight:700">Ver qué pasa →</div>
+            </div>
+            <div onclick="msimStart('amarillo')" style="cursor:pointer;border-radius:12px;border:2px solid #FDE68A;background:#fff;padding:16px;text-align:center" class="sim-case-btn">
+              <div style="font-size:28px;margin-bottom:8px">🟡</div>
+              <div style="font-size:13px;font-weight:700;color:#92400E;margin-bottom:4px">Caso MEDIO</div>
+              <div style="font-size:11px;color:var(--text2);margin-bottom:8px">Marca aprueba cotización — SLA: 4 horas</div>
+              <div style="margin-top:10px;padding:6px 12px;background:var(--amber);color:#fff;border-radius:7px;font-size:11px;font-weight:700">Ver qué pasa →</div>
+            </div>
+            <div onclick="msimStart('rojo')" style="cursor:pointer;border-radius:12px;border:2px solid #FECACA;background:#fff;padding:16px;text-align:center" class="sim-case-btn">
+              <div style="font-size:28px;margin-bottom:8px">🔴</div>
+              <div style="font-size:13px;font-weight:700;color:#B91C1C;margin-bottom:4px">Caso CRÍTICO</div>
+              <div style="font-size:11px;color:var(--text2);margin-bottom:8px">Marca toma control total — protocolo emergencia</div>
+              <div style="margin-top:10px;padding:6px 12px;background:var(--red);color:#fff;border-radius:7px;font-size:11px;font-weight:700">Ver qué pasa →</div>
+            </div>
+          </div>
+          <div id="msim-panel" style="display:none">
+            <div id="msim-header" style="border-radius:12px;padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between">
+              <div style="display:flex;align-items:center;gap:12px">
+                <span id="msim-emoji" style="font-size:28px"></span>
+                <div><div id="msim-title" style="font-size:15px;font-weight:800"></div><div id="msim-subtitle" style="font-size:11px;margin-top:2px"></div></div>
+              </div>
+              <div style="display:flex;align-items:center;gap:12px">
+                <div style="background:rgba(255,255,255,.9);border-radius:10px;padding:8px 16px;text-align:center;min-width:90px">
+                  <div style="font-size:10px;font-weight:600;color:var(--text2);margin-bottom:2px">TIEMPO</div>
+                  <div id="msim-timer" style="font-size:22px;font-weight:800;font-family:monospace;color:var(--text)">Día 0</div>
+                  <div id="msim-timer-sub" style="font-size:9px;color:var(--text2)">Inicio</div>
+                </div>
+                <button onclick="msimReset()" style="padding:6px 12px;border-radius:7px;border:1px solid rgba(255,255,255,.5);background:rgba(255,255,255,.2);color:#fff;font-size:11px;font-weight:600;cursor:pointer">↩ Cambiar caso</button>
+              </div>
+            </div>
+            <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:14px;margin-bottom:14px">
+              <div style="border-radius:10px;border:2px solid #4F9DFF;overflow:hidden">
+                <div style="padding:10px 14px;background:#0A1628;display:flex;align-items:center;gap:8px">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" style="width:14px"><path d="M3 21h18M3 7v14M21 7v14M9 21v-6h6v6M3 7l9-4 9 4"/></svg>
+                  <span style="font-size:11px;font-weight:700;color:#fff">MARCA — Tu panel</span>
+                  <span id="msim-m-status" style="margin-left:auto;font-size:9px;font-weight:700;padding:2px 8px;border-radius:10px;background:rgba(255,255,255,.1);color:#fff">En espera</span>
+                </div>
+                <div id="msim-m-feed" style="padding:12px;min-height:320px;background:#fff;overflow-y:auto;display:flex;flex-direction:column;gap:8px">
+                  <div style="text-align:center;padding:40px 10px;color:var(--text3);font-size:11px">Selecciona un caso</div>
+                </div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:10px">
+                <div style="border-radius:10px;border:1.5px solid var(--border);overflow:hidden;flex:1">
+                  <div style="padding:8px 12px;background:var(--blue);display:flex;align-items:center;gap:7px">
+                    <span style="font-size:10px;font-weight:700;color:#fff">CONSUMIDOR ve...</span>
+                    <span id="msim-c-status" style="margin-left:auto;font-size:9px;padding:1px 6px;border-radius:8px;background:rgba(255,255,255,.2);color:#fff">Esperando</span>
+                  </div>
+                  <div id="msim-c-feed" style="padding:8px;min-height:140px;background:#fff;overflow-y:auto;display:flex;flex-direction:column;gap:6px">
+                    <div style="text-align:center;padding:20px 8px;color:var(--text3);font-size:10px">Sin actividad</div>
+                  </div>
+                </div>
+                <div style="border-radius:10px;border:1.5px solid var(--border);overflow:hidden;flex:1">
+                  <div style="padding:8px 12px;background:#92400E;display:flex;align-items:center;gap:7px">
+                    <span style="font-size:10px;font-weight:700;color:#fff">TALLER ve...</span>
+                    <span id="msim-t-status" style="margin-left:auto;font-size:9px;padding:1px 6px;border-radius:8px;background:rgba(255,255,255,.2);color:#fff">En espera</span>
+                  </div>
+                  <div id="msim-t-feed" style="padding:8px;min-height:140px;background:#fff;overflow-y:auto;display:flex;flex-direction:column;gap:6px">
+                    <div style="text-align:center;padding:20px 8px;color:var(--text3);font-size:10px">Sin actividad</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="card card-p">
+              <div style="font-size:12px;font-weight:700;margin-bottom:12px;display:flex;justify-content:space-between"><span>Progreso</span><span id="msim-step-label" style="font-size:11px;color:var(--text2)">Paso 1</span></div>
+              <div style="display:flex;align-items:center" id="msim-steps-row"></div>
+              <div style="margin-top:14px;display:flex;align-items:center;gap:10px">
+                <button id="msim-btn-next" onclick="msimNext()" style="padding:8px 20px;border-radius:8px;background:#0A1628;color:#fff;font-size:12px;font-weight:700;border:none;cursor:pointer">▶ Avanzar</button>
+                <span id="msim-btn-hint" style="font-size:11px;color:var(--text2)">Haz clic para ver qué pasa a continuación</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -1507,9 +1701,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <div class="mb-body">
       <div style="background:var(--gray);border-radius:9px;padding:14px;margin-bottom:14px">
         <div class="iro"><span class="il">Vehículo</span><span class="iv">Nissan Sentra 2023</span></div>
-        <div class="iro"><span class="il">Categoría</span><span class="iv">Motor y transmisión</span></div>
+        <div class="iro"><span class="il">Categoría</span><span class="iv" id="modal-cat-name">Motor y transmisión</span></div>
         <div class="iro"><span class="il">Taller</span><span class="iv">Nissan Satélite</span></div>
         <div class="iro"><span class="il">Archivos</span><span class="iv">2 adjuntos</span></div>
+      </div>
+      <div id="modal-semaforo" style="border-radius:8px;padding:10px;margin-bottom:12px;display:flex;align-items:center;gap:10px">
+        <span id="modal-sem-emoji" style="font-size:22px"></span>
+        <div><div id="modal-sem-title" style="font-size:12px;font-weight:700"></div><div id="modal-sem-sub" style="font-size:11px;margin-top:2px"></div></div>
       </div>
       <div style="font-size:12px;color:var(--text2)">El taller recibirá notificación inmediata y tendrá <strong>3 días hábiles</strong> para responder.</div>
     </div>
@@ -1547,7 +1745,7 @@ function navC(id,el){
   var labels={
     'c-dashboard':'Dashboard','c-solicitudes':'Solicitudes','c-nueva':'Nueva Solicitud',
     'c-seguimiento':'Seguimiento — #GR-2471','c-chat':'Chat','c-resolucion':'Resolución',
-    'c-vehiculos':'Mis Vehículos','c-historial':'Historial','c-perfil':'Mi Perfil'
+    'c-vehiculos':'Mis Vehículos','c-historial':'Historial','c-perfil':'Mi Perfil','c-simulador':'Simulador de casos'
   };
   document.getElementById('bc-c').textContent=labels[id]||id;
 }
@@ -1561,7 +1759,7 @@ function navT(id,el){
   var labels={
     't-dashboard':'Dashboard','t-casos':'Casos asignados','t-diagnostico':'Diagnóstico — #GR-2471',
     't-cotizacion':'Cotización','t-chat':'Chat con clientes','t-rendimiento':'Mi rendimiento',
-    't-auto':'Casos automáticos vs humanos','t-monitor':'Monitor SLA en tiempo real','t-flujo':'Flujo de escalamiento'
+    't-auto':'Casos automáticos vs humanos','t-monitor':'Monitor SLA en tiempo real','t-flujo':'Flujo de escalamiento','t-simulador':'Simulador de casos — Vista Taller'
   };
   document.getElementById('bc-t').textContent=labels[id]||id;
 }
@@ -1573,7 +1771,7 @@ function navM(id,el){
   document.querySelectorAll('#app-marca .ni').forEach(function(n){n.classList.remove('on')});
   if(el)el.classList.add('on');
   var labels={
-    'm-dashboard':'Dashboard Global','m-aprobaciones':'Aprobaciones pendientes',
+    'm-dashboard':'Dashboard Global','m-aprobaciones':'Aprobaciones pendientes','m-simulador':'Simulador de casos — Vista Marca',
     'm-escalamientos':'Escalamientos','m-distribuidores':'Red de distribuidores',
     'm-campanas':'Campañas de servicio','m-reportes':'Reportes ejecutivos'
   };
@@ -1581,12 +1779,79 @@ function navM(id,el){
 }
 
 // MODAL
-function openModal(){document.getElementById('modal').classList.add('open')}
+function openModal(){
+  var sel = document.getElementById('form-categoria');
+  if (sel) {
+    var val = sel.options[sel.selectedIndex].value;
+    var txt = sel.options[sel.selectedIndex].text;
+    var semInfo = {
+      rojo: { emoji:'🔴', title:'Caso CRÍTICO — Intervención humana inmediata', sub:'Se omite la negociación. Jurídico y gerencia serán notificados de inmediato.', bg:'#FEE2E2', color:'#B91C1C' },
+      amarillo: { emoji:'🟡', title:'Caso MEDIO — Negociación automática', sub:'La IA activará el motor de negociación. Resolución en máximo 5 días hábiles.', bg:'#FEF3C7', color:'#92400E' },
+      verde: { emoji:'🟢', title:'Caso BAJO — Auto resolución', sub:'El Chatbot FAQ responderá automáticamente con base en tu contrato de garantía.', bg:'#DCFCE7', color:'#15803D' }
+    };
+    var s = semInfo[val] || semInfo['amarillo'];
+    var catName = document.getElementById('modal-cat-name');
+    if (catName) catName.textContent = txt;
+    var sem = document.getElementById('modal-semaforo');
+    if (sem) { sem.style.background = s.bg; sem.style.border = '1px solid'; }
+    var semEmoji = document.getElementById('modal-sem-emoji');
+    if (semEmoji) semEmoji.textContent = s.emoji;
+    var semTitle = document.getElementById('modal-sem-title');
+    if (semTitle) { semTitle.textContent = s.title; semTitle.style.color = s.color; }
+    var semSub = document.getElementById('modal-sem-sub');
+    if (semSub) { semSub.textContent = s.sub; semSub.style.color = s.color; }
+  }
+  document.getElementById('modal').classList.add('open');
+}
 function closeModal(){document.getElementById('modal').classList.remove('open')}
 function sendReq(){
   closeModal();
   showToast('Solicitud #GR-2472 enviada exitosamente','suc');
-  setTimeout(function(){navC('c-seguimiento',document.querySelector('[data-page=c-seguimiento]'))},1200);
+  var sel = document.getElementById('form-categoria');
+  var color = sel ? sel.options[sel.selectedIndex].value : 'amarillo';
+  window._pendingSimColor = color;
+  setTimeout(function(){
+    navC('c-seguimiento',document.querySelector('[data-page=c-seguimiento]'));
+    // inject the "ver resolución" banner into seguimiento
+    var existing = document.getElementById('seguimiento-sim-banner');
+    if (!existing) {
+      var seg = document.getElementById('pg-c-seguimiento');
+      var banner = document.createElement('div');
+      banner.id = 'seguimiento-sim-banner';
+      var colores = {
+        rojo: { emoji:'🔴', label:'CRÍTICO', desc:'Falla de seguridad — Humano directo inmediato', bg:'#FEE2E2', border:'#FECACA', color:'#B91C1C', btnBg:'#EF4444' },
+        amarillo: { emoji:'🟡', label:'MEDIO', desc:'Falla de confort — Negociación automática (5 días)', bg:'#FEF3C7', border:'#FDE68A', color:'#92400E', btnBg:'#F59E0B' },
+        verde: { emoji:'🟢', label:'BAJO', desc:'Consulta — Auto resolución inmediata por Chatbot', bg:'#DCFCE7', border:'#BBF7D0', color:'#15803D', btnBg:'#22C55E' }
+      };
+      var c = colores[color] || colores['amarillo'];
+      banner.style.cssText = 'border-radius:12px;border:2px solid '+c.border+';background:'+c.bg+';padding:14px 16px;margin-bottom:16px;display:flex;align-items:center;gap:14px';
+      banner.innerHTML = '<span style="font-size:32px;flex-shrink:0">'+c.emoji+'</span>'
+        +'<div style="flex:1">'
+        +'<div style="font-size:13px;font-weight:800;color:'+c.color+'">La IA clasificó tu caso como '+c.label+'</div>'
+        +'<div style="font-size:11px;color:'+c.color+';margin-top:3px;opacity:.8">'+c.desc+'</div>'
+        +'<div style="font-size:11px;color:'+c.color+';margin-top:4px;opacity:.7">Tu solicitud #GR-2472 fue recibida. El taller y la marca ya fueron notificados.</div>'
+        +'</div>'
+        +'<button onclick="verResolucion()" style="padding:9px 16px;border-radius:9px;background:'+c.btnBg+';color:#fff;font-size:12px;font-weight:700;border:none;cursor:pointer;white-space:nowrap;flex-shrink:0">'
+        +'▶ Ver cómo se resuelve'
+        +'</button>';
+      seg.insertBefore(banner, seg.firstChild);
+    } else {
+      existing.style.display = 'flex';
+    }
+  }, 1200);
+}
+
+function verResolucion() {
+  var color = window._pendingSimColor || 'amarillo';
+  var overlay = document.getElementById('sim-overlay');
+  if (overlay) {
+    overlay.style.display = 'flex';
+    simOverlayStart(color);
+  }
+}
+function cerrarSimOverlay() {
+  var overlay = document.getElementById('sim-overlay');
+  if (overlay) overlay.style.display = 'none';
 }
 
 // TOAST
@@ -1634,6 +1899,29 @@ function acceptResC(){
   if(!cSigned){showToast('Firma primero el acuerdo','err');return;}
   showToast('🎉 ¡Garantía ejecutada! Reporte enviado por correo','suc');
   setTimeout(function(){navC('c-historial',document.querySelector('[data-page=c-historial]'))},1800);
+}
+
+// CATEGORIA TAG
+function updateCategoriaTag() {
+  var sel = document.getElementById('form-categoria');
+  if (!sel) return;
+  var val = sel.options[sel.selectedIndex].value;
+  var tag = document.getElementById('categoria-tag');
+  if (!tag) return;
+  var info = {
+    rojo: { emoji:'🔴', label:'CRÍTICO — Irá directo a intervención humana', bg:'#FEE2E2', color:'#B91C1C', border:'#FECACA' },
+    amarillo: { emoji:'🟡', label:'MEDIO — Negociación automática (máx. 5 días)', bg:'#FEF3C7', color:'#92400E', border:'#FDE68A' },
+    verde: { emoji:'🟢', label:'BAJO — Auto resolución inmediata por Chatbot', bg:'#DCFCE7', color:'#15803D', border:'#BBF7D0' }
+  };
+  var i = info[val] || info['amarillo'];
+  tag.style.display = 'flex';
+  tag.style.alignItems = 'center';
+  tag.style.gap = '6px';
+  tag.style.padding = '6px 10px';
+  tag.style.borderRadius = '7px';
+  tag.style.background = i.bg;
+  tag.style.border = '1px solid ' + i.border;
+  tag.innerHTML = '<span style="font-size:14px">'+i.emoji+'</span><span style="font-size:11px;font-weight:700;color:'+i.color+'">'+i.label+'</span>';
 }
 
 // RATING
@@ -1978,6 +2266,545 @@ function addEventCard(feedId, ev) {
   feed.scrollTop = feed.scrollHeight;
 }
 
+// ======= SHARED SIM HELPERS =======
+var tsimState = {caso:null, step:0};
+var msimState = {caso:null, step:0};
+
+function xCard(feedId, ev, small) {
+  var feed = document.getElementById(feedId);
+  if (!feed) return;
+  var ph = feed.querySelector('[data-ph]');
+  if (ph) ph.remove();
+  var card = document.createElement('div');
+  var p = small ? '7px' : '10px';
+  var _bg = ev.bg || ev.color || '#F5F7FA';
+  var _bdr = ev.bdr || ev.border || '#E5E7EB';
+  card.style.cssText = 'border-radius:8px;border:1px solid '+_bdr+';background:'+_bg+';padding:'+p+';animation:fadeIn .4s ease';
+  card.innerHTML = '<div style="display:flex;align-items:center;gap:5px;margin-bottom:4px"><span style="font-size:'+(small?'12':'14')+'px">'+ev.icon+'</span><span style="font-size:11px;font-weight:700;color:#1F2937">'+ev.title+'</span></div>'
+    +'<div style="font-size:10px;color:#374151;line-height:1.5">'+ev.body+'</div>';
+  feed.appendChild(card);
+  feed.scrollTop = feed.scrollHeight;
+}
+
+function xTimer(tid, sid, d, h) {
+  var el = document.getElementById(tid);
+  var sel = document.getElementById(sid);
+  if (el) el.textContent = d===0 ? 'Día 0' : 'Día '+d;
+  if (sel) sel.textContent = d===0&&h===0 ? 'Inicio' : (d>0 ? d+(d===1?' día ':' días ')+(h>0?h+'h':'') : h+' hora'+(h===1?'':'s'));
+}
+
+function xBuildSteps(prefix, steps) {
+  var row = document.getElementById(prefix+'steps-row');
+  if (!row) return;
+  row.innerHTML = '';
+  steps.forEach(function(s,i) {
+    var d = document.createElement('div');
+    d.style.cssText = 'display:flex;align-items:center;flex:1';
+    d.innerHTML = '<div id="'+prefix+'dot-'+i+'" style="width:26px;height:26px;border-radius:50%;border:2px solid #E5E7EB;background:#fff;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#9CA3AF;flex-shrink:0;transition:all .3s">'+(i+1)+'</div>'
+      +'<div style="font-size:9px;color:#9CA3AF;margin-left:3px;white-space:nowrap;max-width:65px;overflow:hidden;text-overflow:ellipsis" id="'+prefix+'lbl-'+i+'">'+s.label+'</div>'
+      +(i<steps.length-1?'<div id="'+prefix+'line-'+i+'" style="flex:1;height:2px;background:#E5E7EB;margin:0 3px;transition:all .3s"></div>':'');
+    row.appendChild(d);
+  });
+}
+
+function xDots(prefix, idx, total) {
+  for (var i=0;i<total;i++) {
+    var dot=document.getElementById(prefix+'dot-'+i);
+    var lbl=document.getElementById(prefix+'lbl-'+i);
+    var line=document.getElementById(prefix+'line-'+i);
+    if (!dot) continue;
+    if (i<idx){dot.style.background='#22C55E';dot.style.borderColor='#22C55E';dot.style.color='#fff';dot.textContent='✓';if(lbl)lbl.style.color='#15803D';if(line)line.style.background='#22C55E';}
+    else if(i===idx){dot.style.background='#0052CC';dot.style.borderColor='#0052CC';dot.style.color='#fff';dot.textContent=i+1;if(lbl)lbl.style.color='#0052CC';}
+    else{dot.style.background='#fff';dot.style.borderColor='#E5E7EB';dot.style.color='#9CA3AF';dot.textContent=i+1;if(lbl)lbl.style.color='#9CA3AF';}
+  }
+}
+
+function xBtn(btnId, hintId, done, color, fn) {
+  var btn=document.getElementById(btnId);
+  var hint=document.getElementById(hintId);
+  if (!btn) return;
+  if (done){btn.textContent='✓ Simulación completada';btn.style.background='#22C55E';btn.onclick=null;if(hint)hint.textContent='Haz clic en Cambiar caso para probar otro.';}
+  else{btn.innerHTML='▶ Avanzar al siguiente paso';btn.style.background=color;btn.onclick=fn;if(hint)hint.textContent='Haz clic para ver qué pasa a continuación';}
+}
+
+// ======= TALLER SIMULATOR DATA =======
+function getTCASOS(caso) {
+  var g='#DCFCE7',gb='#BBF7D0',gy='#F5F7FA',gyb='#E5E7EB',a='#FEF3C7',ab='#FDE68A',r='#FEE2E2',rb='#FECACA',bl='#EBF2FF',blb='#BFDBFE',ge='#15803D';
+  var CASOS = {
+    verde:{
+      emoji:'🟢',title:'Caso BAJO — Consulta de cobertura',subtitle:'Dunia Rodríguez pregunta si su revisión preventiva está cubierta. El chatbot lo resuelve.',
+      headerBg:'linear-gradient(135deg,#DCFCE7,#BBF7D0)',headerColor:ge,
+      steps:[
+        {label:'Solicitud recibida',dias:0,horas:0,
+          t:{status:'Notificación recibida',color:'#6B7280',event:{icon:'📋',bg:gy,bdr:gyb,title:'Notificación informativa — Caso BAJO',body:'El sistema notificó al taller: Cliente Dunia Rodríguez realizó una consulta de cobertura. Clasificación: BAJO. El Chatbot FAQ responderá automáticamente. No se requiere acción del taller.'}},
+          c:{status:'Consulta enviada',color:'#0052CC',event:{icon:'📱',bg:bl,bdr:blb,title:'Cliente envió consulta',body:'Dunia preguntó si la revisión de 10,000 km está cubierta. El sistema procesa la respuesta.'}},
+          m:{status:'Registrado',color:'#6B7280',event:{icon:'📊',bg:gy,bdr:gyb,title:'Caso registrado sin intervención',body:'La marca recibió el registro del caso BAJO. Sin acción requerida.'}}
+        },
+        {label:'Chatbot responde',dias:0,horas:0,
+          t:{status:'Sin acción requerida',color:ge,event:{icon:'✅',bg:g,bdr:gb,title:'Confirmación enviada al taller',body:'El sistema envió al taller: Revisión de 10,000 km cubierta por garantía (Cláusula 4.2). Cuando venga Dunia, NO cobrar esta revisión. Caso cerrado automáticamente.'}},
+          c:{status:'Resuelto ✓',color:ge,event:{icon:'🤖',bg:g,bdr:gb,title:'Chatbot respondió en 45 segundos',body:'Dunia recibió: Su revisión de 10,000 km está cubierta al 100% por su garantía. No tiene costo en la red autorizada.'}},
+          m:{status:'Auto-cerrado',color:ge,event:{icon:'📈',bg:g,bdr:gb,title:'Caso cerrado — métricas actualizadas',body:'+1 caso auto-resuelto. Tiempo: 45 seg. Costo para la marca: $0. NPS: 5/5.'}}
+        }
+      ]
+    },
+    amarillo:{
+      emoji:'🟡',title:'Caso MEDIO — Falla de Aire Acondicionado',subtitle:'Carlos Mendoza reporta A/C defectuoso. El taller diagnostica en 48h y envía cotización a la marca.',
+      headerBg:'linear-gradient(135deg,#FEF3C7,#FDE68A)',headerColor:'#92400E',
+      steps:[
+        {label:'Caso asignado',dias:0,horas:0,
+          t:{status:'🔔 Nuevo caso — SLA: 48h',color:'#F59E0B',event:{icon:'🔔',bg:a,bdr:ab,title:'Nuevo caso #GR-2441 asignado — SLA: 48 horas',body:'El sistema asignó el caso a Rodrigo Sánchez: Carlos Mendoza reporta A/C defectuoso en Sentra 2023. Historial: 2 ingresos previos mismo problema. VIN verificado en garantía. Emitir diagnóstico antes de las 18:00 del Día 2.'}},
+          c:{status:'Solicitud enviada',color:'#0052CC',event:{icon:'📱',bg:bl,bdr:blb,title:'Carlos envió la solicitud',body:'Solicitud #GR-2441 recibida. Carlos fue notificado: Tu caso fue asignado al técnico Rodrigo Sánchez en Nissan Satélite. Recibirás respuesta en máximo 48 horas.'}},
+          m:{status:'Monitoreando',color:'#6B7280',event:{icon:'📊',bg:gy,bdr:gyb,title:'Caso MEDIO registrado',body:'La marca ve el caso en su dashboard. Sin acción requerida aún. Esperando cotización del taller.'}}
+        },
+        {label:'Vehículo recibido',dias:0,horas:3,
+          t:{status:'Vehículo en taller',color:'#F59E0B',event:{icon:'🚗',bg:a,bdr:ab,title:'Vehículo recibido — inspección iniciada',body:'El taller registró la recepción del Sentra 2023 de Carlos. Rodrigo inició la inspección del sistema de A/C. Cliente notificado automáticamente.'}},
+          c:{status:'En revisión',color:'#F59E0B',event:{icon:'🔧',bg:a,bdr:ab,title:'Taller confirmó recepción',body:'Carlos recibió: Tu Nissan Sentra 2023 fue recibido por Rodrigo Sánchez. La revisión comenzó. Te notificaremos antes de las 6pm.'}},
+          m:{status:'Sin acción',color:'#6B7280',event:null}
+        },
+        {label:'Diagnóstico emitido',dias:1,horas:6,
+          t:{status:'✅ Diagnóstico enviado',color:ge,event:{icon:'📋',bg:g,bdr:gb,title:'Diagnóstico completado — SLA cumplido en 30h',body:'Rodrigo emitió: Compresor de A/C con válvula de expansión defectuosa. Defecto de fabricación. Cotización: $4,200 + $1,800 + $1,200 = $7,200 total. Cobertura recomendada: 100% garantía. Enviado a Nissan México.'}},
+          c:{status:'Diagnóstico listo',color:'#F59E0B',event:{icon:'🔍',bg:a,bdr:ab,title:'Diagnóstico recibido',body:'Carlos recibió: Diagnóstico listo — falla en compresor de A/C por defecto de fabricación. Cotización enviada a Nissan México. Respuesta en máximo 4 horas.'}},
+          m:{status:'⏳ Cotización recibida',color:'#F59E0B',event:{icon:'📋',bg:a,bdr:ab,title:'Cotización recibida — SLA: 4 horas',body:'Nissan México recibió cotización de $7,200 — cobertura 100%. El gerente tiene 4 horas para aprobar o rechazar.'}}
+        },
+        {label:'Marca aprueba',dias:2,horas:0,
+          t:{status:'✅ Reparación autorizada',color:ge,event:{icon:'🔑',bg:g,bdr:gb,title:'Nissan México aprobó la cotización',body:'El taller recibió autorización: Cotización #GR-2441 aprobada por $7,200 — 100% cobertura. Puedes iniciar la reparación. Reembolso procesado por la marca.'}},
+          c:{status:'¡Aprobado! ✓',color:ge,event:{icon:'🎉',bg:g,bdr:gb,title:'¡Garantía aprobada al 100%!',body:'Carlos recibió: Nissan México aprobó tu garantía. Costo para ti: $0. La reparación inicia hoy y tu vehículo estará listo en 2 días.'}},
+          m:{status:'Aprobado en 2h ✓',color:ge,event:{icon:'✅',bg:g,bdr:gb,title:'Aprobación emitida — SLA cumplido',body:'Gerente aprobó en 2h (SLA: 4h). Monto $7,200. Reembolso programado al taller.'}}
+        },
+        {label:'Caso cerrado',dias:4,horas:0,
+          t:{status:'Caso cerrado ✓',color:ge,event:{icon:'🏆',bg:g,bdr:gb,title:'Reparación completada — Caso cerrado',body:'Vehículo entregado. Carlos firmó el acuerdo digitalmente. PDF generado y enviado a las 3 partes. Rendimiento del técnico actualizado: NPS 5/5.'}},
+          c:{status:'Cerrado ✓',color:ge,event:{icon:'⭐',bg:g,bdr:gb,title:'Carlos firmó y calificó 5/5',body:'Nunca pensé que sería tan rápido. En 4 días resolvieron lo que en otro lado hubiera tardado meses.'}},
+          m:{status:'Archivado',color:ge,event:{icon:'📈',bg:g,bdr:gb,title:'Métricas actualizadas',body:'Caso cerrado en 4 días. Litigio evitado: $45,000 estimado. NPS: 5/5. Cliente fidelizado.'}}
+        }
+      ]
+    },
+    rojo:{
+      emoji:'🔴',title:'Caso CRÍTICO — Falla de Frenos',subtitle:'Ana Gutiérrez reporta frenos defectuosos. La marca toma el control — el taller apoya con diagnóstico.',
+      headerBg:'linear-gradient(135deg,#FEE2E2,#FECACA)',headerColor:'#B91C1C',
+      steps:[
+        {label:'Alerta de emergencia',dias:0,horas:0,
+          t:{status:'🚨 Alerta crítica',color:'#B91C1C',event:{icon:'🚨',bg:r,bdr:rb,title:'ALERTA CRÍTICA — Falla de seguridad activa',body:'El sistema notificó al gerente del taller: CASO CRÍTICO #GR-2489 — Falla de frenos en Kicks 2023. SE OMITIÓ la negociación automática. Acciones requeridas: (1) Decirle a Ana que NO conduzca. (2) Organizar grúa inmediata. (3) Asignar técnico senior para diagnóstico urgente.'}},
+          c:{status:'🚨 Caso crítico',color:'#B91C1C',event:{icon:'🚨',bg:r,bdr:rb,title:'Sistema detectó falla crítica',body:'Ana recibió: Tu caso fue clasificado como CRÍTICO por seguridad. Por favor NO conduzcas el vehículo. Hemos alertado al taller y a Nissan México. Una grúa está en camino.'}},
+          m:{status:'🚨 Jurídico alertado',color:'#B91C1C',event:{icon:'⚖️',bg:r,bdr:rb,title:'Área jurídica y gerencia notificadas',body:'Nissan México recibió alerta: Falla de seguridad activa — frenos — Kicks 2023. 3 episodios en 7 días. Posible responsabilidad civil. Acción inmediata requerida.'}}
+        },
+        {label:'Protocolo emergencia',dias:0,horas:1,
+          t:{status:'Grúa despachada',color:'#B91C1C',event:{icon:'🚛',bg:r,bdr:rb,title:'Grúa y técnico senior movilizados',body:'El gerente ejecutó el protocolo: Grúa despachada (ETA: 25 min). Técnico senior Ing. Castro asignado. Vehículo sustituto Kicks 2024 preparado para Ana sin costo.'}},
+          c:{status:'Grúa en camino',color:'#B91C1C',event:{icon:'🚛',bg:r,bdr:rb,title:'Grúa y vehículo sustituto enviados',body:'Ana recibió: Una grúa llega en 25 min. Un Kicks 2024 de cortesía te espera en el taller. Todo sin costo mientras resolvemos tu caso.'}},
+          m:{status:'Investigando lote',color:'#B91C1C',event:{icon:'🔍',bg:r,bdr:rb,title:'Área de calidad investiga el lote',body:'Nissan México lanzó búsqueda de casos similares. Resultado preliminar: 4 casos de frenos en Kicks 2023 en las últimas 4 semanas en 3 talleres distintos.'}}
+        },
+        {label:'Diagnóstico técnico',dias:0,horas:5,
+          t:{status:'Diagnóstico completado',color:'#B91C1C',event:{icon:'🔧',bg:r,bdr:rb,title:'Diagnóstico técnico en 4 horas',body:'Ing. Castro reportó: Falla en actuador ABS y válvula del servofreno. Defecto de fabricación — lote Ene-Feb 2023. Vehículo NO apto para circular. Revisé 2 Kicks más del mismo lote — misma falla latente. Recomiendo campaña de servicio urgente.'}},
+          c:{status:'Diagnóstico recibido',color:'#B91C1C',event:{icon:'📋',bg:r,bdr:rb,title:'Ana fue informada',body:'Ana recibió: Diagnóstico confirmado — falla de fabricación en frenos. Nissan México autorizará la reparación completa sin costo. Tu Kicks estará listo en 2 días.'}},
+          m:{status:'5 casos confirmados',color:'#B91C1C',event:{icon:'⚠️',bg:r,bdr:rb,title:'Defecto de lote confirmado — Recall iniciado',body:'Con el reporte del taller, Nissan México confirmó 5 vehículos afectados. Campaña de servicio CS-2025-09 activada para 847 Kicks ENE-FEB 2023 en la red nacional.'}}
+        },
+        {label:'Reparación y recall',dias:1,horas:0,
+          t:{status:'Caso cerrado ✓',color:ge,event:{icon:'✅',bg:g,bdr:gb,title:'Reparación completada en menos de 24 horas',body:'Taller entregó el Kicks reparado. Nissan México reembolsó $12,400. Ana firmó con garantía extendida de 2 años en frenos. NPS: 5/5.'}},
+          c:{status:'Resuelto + Recall ✓',color:ge,event:{icon:'🎉',bg:g,bdr:gb,title:'Ana recuperó su vehículo',body:'Ana recibió el Kicks con frenos reparados. Costo: $0. Garantía extendida 2 años. Calificación: 5 estrellas.'}},
+          m:{status:'Recall activo — 847 vehículos',color:'#B91C1C',event:{icon:'📢',bg:r,bdr:rb,title:'Campaña CS-2025-09 activa',body:'847 propietarios de Kicks ENE-FEB 2023 notificados. La queja de Ana permitió detectar el defecto de lote en 24h vs semanas en el proceso tradicional.'}}
+        }
+      ]
+    }
+  };
+  return CASOS[caso];
+}
+
+function getMCASOS(caso) {
+  var g='#DCFCE7',gb='#BBF7D0',gy='#F5F7FA',gyb='#E5E7EB',a='#FEF3C7',ab='#FDE68A',r='#FEE2E2',rb='#FECACA',bl='#EBF2FF',blb='#BFDBFE',ge='#15803D';
+  var CASOS = {
+    verde:{
+      emoji:'🟢',title:'Caso BAJO — La marca NO interviene',subtitle:'Consulta de cobertura resuelta por chatbot. La marca solo ve el registro en su dashboard.',
+      headerBg:'linear-gradient(135deg,#DCFCE7,#BBF7D0)',headerColor:ge,
+      steps:[
+        {label:'Solicitud registrada',dias:0,horas:0,
+          m:{status:'Solo registro',color:'#6B7280',event:{icon:'📊',bg:gy,bdr:gyb,title:'Caso BAJO — Sin intervención requerida',body:'Dashboard registró: Consulta de cobertura — Dunia Rodríguez — Sentra 2023. Clasificación: BAJO. Canal: Chatbot FAQ. Sin aprobación ni acción requerida de la marca.'}},
+          c:{status:'Consulta enviada',color:'#0052CC',event:{icon:'📱',bg:bl,bdr:blb,title:'Cliente envió consulta',body:'Dunia preguntó sobre cobertura de su revisión preventiva. El sistema está procesando.'}},
+          t:{status:'Notificado',color:'#6B7280',event:{icon:'📋',bg:gy,bdr:gyb,title:'Taller recibió notificación informativa',body:'El taller fue informado que el chatbot responderá. Sin acción requerida.'}}
+        },
+        {label:'Chatbot cierra',dias:0,horas:0,
+          m:{status:'Auto-cerrado ✓',color:ge,event:{icon:'✅',bg:g,bdr:gb,title:'Caso cerrado — métricas actualizadas',body:'Dashboard actualizó: +1 caso auto-resuelto (BAJO). Tiempo: 45 segundos. Costo: $0. NPS: 5/5. Este tipo de casos representa el 38% del volumen total.'}},
+          c:{status:'Resuelto ✓',color:ge,event:{icon:'🤖',bg:g,bdr:gb,title:'Chatbot respondió en 45 segundos',body:'Dunia recibió confirmación de cobertura basada en su contrato VIN.'}},
+          t:{status:'Confirmación enviada',color:ge,event:{icon:'✅',bg:g,bdr:gb,title:'Taller recibió instrucción',body:'El taller fue notificado: No cobrar revisión de 10,000 km a Dunia — cubierta por garantía.'}}
+        }
+      ]
+    },
+    amarillo:{
+      emoji:'🟡',title:'Caso MEDIO — La marca aprueba cotización',subtitle:'Falla de A/C — el taller hizo el diagnóstico. La marca tiene 4 horas para aprobar la cotización de $7,200.',
+      headerBg:'linear-gradient(135deg,#FEF3C7,#FDE68A)',headerColor:'#92400E',
+      steps:[
+        {label:'Caso registrado',dias:0,horas:0,
+          m:{status:'Monitoreando',color:'#6B7280',event:{icon:'📊',bg:gy,bdr:gyb,title:'Caso MEDIO registrado — espera diagnóstico',body:'Dashboard registró caso #GR-2441. Estado: En espera de diagnóstico técnico del taller Nissan Satélite. SLA taller: 48 horas. Sin acción de la marca en esta etapa.'}},
+          c:{status:'Solicitud enviada',color:'#0052CC',event:{icon:'📱',bg:bl,bdr:blb,title:'Carlos envió solicitud',body:'Solicitud recibida. El sistema asignó el caso al taller Nissan Satélite.'}},
+          t:{status:'Caso asignado',color:'#F59E0B',event:{icon:'🔔',bg:a,bdr:ab,title:'Taller recibió el caso — SLA: 48h',body:'Rodrigo Sánchez recibió el caso y tiene 48 horas para emitir diagnóstico.'}}
+        },
+        {label:'Cotización recibida',dias:1,horas:6,
+          m:{status:'⏳ Aprobar en 4h',color:'#F59E0B',event:{icon:'📋',bg:a,bdr:ab,title:'Cotización recibida — SLA: 4 horas para responder',body:'Cotización del taller Nissan Satélite: Compresor A/C: $4,200 + Válvula: $1,800 + MO: $1,200 = TOTAL: $7,200. Historial VIN: 2 ingresos previos misma falla. Sistema recomienda APROBAR al 100%. Tiempo restante: 4 horas.'}},
+          c:{status:'Esperando marca',color:'#F59E0B',event:{icon:'⏱',bg:a,bdr:ab,title:'Esperando aprobación de Nissan México',body:'Carlos fue notificado: El taller envió el diagnóstico a Nissan México. Recibirás respuesta en máximo 4 horas.'}},
+          t:{status:'Cotización enviada ✓',color:ge,event:{icon:'📤',bg:g,bdr:gb,title:'Cotización enviada a la marca',body:'Rodrigo completó diagnóstico en 30h y envió cotización a Nissan México. Ahora espera aprobación.'}}
+        },
+        {label:'Marca aprueba',dias:2,horas:0,
+          m:{status:'✅ Aprobado en 2h',color:ge,event:{icon:'✅',bg:g,bdr:gb,title:'Gerente aprobó — SLA cumplido en 2 horas',body:'El gerente revisó: Historial VIN 2 ingresos previos misma falla. Diagnóstico: defecto de fabricación. Filtro de Equidad Contractual: sin cláusulas abusivas. Decisión: APROBAR al 100% — $7,200 a cargo de la marca. Taller y cliente notificados.'}},
+          c:{status:'¡Aprobado! ✓',color:ge,event:{icon:'🎉',bg:g,bdr:gb,title:'¡Garantía aprobada al 100%!',body:'Carlos recibió la buena noticia: reparación cubierta completa. Costo: $0.'}},
+          t:{status:'Reparación autorizada',color:ge,event:{icon:'🔑',bg:g,bdr:gb,title:'Taller recibió autorización',body:'Rodrigo puede iniciar la reparación. Reembolso de $7,200 programado.'}}
+        },
+        {label:'Caso cerrado',dias:4,horas:0,
+          m:{status:'Archivado ✓',color:ge,event:{icon:'📈',bg:g,bdr:gb,title:'Caso cerrado — impacto medido',body:'Resumen: Tiempo total 4 días (vs 8-14 meses en juzgado). Costo garantía: $7,200. Litigio evitado: $45,000 estimado. ROI del caso: $37,800 neto. NPS cliente: 5/5. Cliente fidelizado.'}},
+          c:{status:'Cerrado ✓',color:ge,event:{icon:'✍️',bg:g,bdr:gb,title:'Carlos firmó el acuerdo',body:'Firma digital registrada. Expediente PDF certificado enviado a las 3 partes.'}},
+          t:{status:'Caso cerrado ✓',color:ge,event:{icon:'🏆',bg:g,bdr:gb,title:'Rendimiento actualizado',body:'Rodrigo: +1 caso resuelto en tiempo. NPS 5/5. Ranking taller actualizado.'}}
+        }
+      ]
+    },
+    rojo:{
+      emoji:'🔴',title:'Caso CRÍTICO — La marca toma el control total',subtitle:'Falla de frenos en Kicks 2023. Jurídico y gerencia actúan de inmediato. Taller apoya con diagnóstico.',
+      headerBg:'linear-gradient(135deg,#FEE2E2,#FECACA)',headerColor:'#B91C1C',
+      steps:[
+        {label:'Alerta crítica',dias:0,horas:0,
+          m:{status:'🚨 Acción inmediata',color:'#B91C1C',event:{icon:'⚖️',bg:r,bdr:rb,title:'ALERTA CRÍTICA — Intervención jurídica y gerencial',body:'Área jurídica y gerencia general recibieron alerta: FALLA DE SEGURIDAD ACTIVA — Frenos — Kicks 2023. VIN: 3N1CP5CU9PL234567. 3 episodios en 7 días. Riesgo de vida. Posible responsabilidad civil. SE OMITIÓ LA NEGOCIACIÓN AUTOMÁTICA. Protocolo de emergencia inmediato.'}},
+          c:{status:'🚨 Alerta enviada',color:'#B91C1C',event:{icon:'🚨',bg:r,bdr:rb,title:'Ana fue alertada',body:'Ana recibió: Caso CRÍTICO. No conduzcas el vehículo. Grúa en camino.'}},
+          t:{status:'🚨 Alerta recibida',color:'#B91C1C',event:{icon:'🔔',bg:r,bdr:rb,title:'Taller activó protocolo',body:'El gerente del taller recibió instrucciones de la marca: grúa y técnico senior inmediatos.'}}
+        },
+        {label:'Protocolo ejecutado',dias:0,horas:2,
+          m:{status:'Protocolo activo',color:'#B91C1C',event:{icon:'🛡️',bg:r,bdr:rb,title:'Protocolo de emergencia ejecutado',body:'Nissan México ejecutó en paralelo: 1) Asesor jurídico revisando póliza de responsabilidad civil. 2) Grúa y vehículo sustituto autorizados. 3) Investigación de lote iniciada en base de datos nacional. 4) Comunicación preparada para reguladores.'}},
+          c:{status:'Grúa en camino',color:'#B91C1C',event:{icon:'🚛',bg:r,bdr:rb,title:'Grúa y sustituto enviados',body:'Ana recibió confirmación de grúa y Kicks 2024 de cortesía.'}},
+          t:{status:'Técnico senior asignado',color:'#B91C1C',event:{icon:'🔧',bg:r,bdr:rb,title:'Ing. Castro asignado',body:'El taller asignó al técnico más senior para diagnóstico prioritario del sistema de frenos.'}}
+        },
+        {label:'Defecto confirmado',dias:0,horas:6,
+          m:{status:'🚨 Recall iniciado',color:'#B91C1C',event:{icon:'🔍',bg:r,bdr:rb,title:'5 casos confirmados — Decisión: Recall',body:'El área de calidad confirmó: 5 vehículos Kicks ENE-FEB 2023 con la misma falla. Defecto: actuador ABS + válvula servofreno. Decisión: CAMPAÑA CS-2025-09. Alcance: 847 vehículos en la red nacional.'}},
+          c:{status:'Informada',color:'#B91C1C',event:{icon:'📋',bg:r,bdr:rb,title:'Ana fue informada',body:'Ana recibió: Confirmamos defecto de fabricación en tu vehículo. La reparación es 100% a cargo de Nissan México.'}},
+          t:{status:'Reporte enviado ✓',color:ge,event:{icon:'📤',bg:g,bdr:gb,title:'Reporte técnico enviado',body:'El taller entregó el reporte completo que confirmó el defecto de lote.'}}
+        },
+        {label:'Recall + cierre',dias:1,horas:0,
+          m:{status:'Recall activo — 847 vehículos',color:'#B91C1C',event:{icon:'📢',bg:r,bdr:rb,title:'Impacto total del caso crítico',body:'Resumen ejecutivo: Ana reparada en menos de 24h a $0. Campaña CS-2025-09: 847 vehículos notificados. Accidentes potenciales evitados. Responsabilidad civil evitada: estimado $800M. Detección del defecto: 24h (vs semanas en proceso tradicional).'}},
+          c:{status:'Resuelto ✓',color:ge,event:{icon:'🎉',bg:g,bdr:gb,title:'Ana recuperó su vehículo reparado',body:'Ana firmó con garantía extendida de 2 años en frenos. Calificación: 5/5.'}},
+          t:{status:'Caso cerrado ✓',color:ge,event:{icon:'📁',bg:g,bdr:gb,title:'Taller cerró el caso',body:'El taller recibió instrucciones para revisar todos los Kicks ENE-FEB 2023 de su inventario.'}}
+        }
+      ]
+    }
+  };
+  return CASOS[caso];
+}
+
+// ======= TALLER SIM FUNCTIONS =======
+function tsimStart(caso) {
+  tsimState = {caso:caso, step:0};
+  var c = getTCASOS(caso);
+  document.getElementById('tsim-selector').style.display = 'none';
+  document.getElementById('tsim-panel').style.display = 'block';
+  var hdr = document.getElementById('tsim-header');
+  if (hdr) { hdr.style.background = c.headerBg; }
+  ['tsim-emoji','tsim-title','tsim-subtitle'].forEach(function(id, i) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    if (i===0) el.textContent = c.emoji;
+    else if (i===1) { el.textContent = c.title; el.style.color = c.headerColor; }
+    else { el.textContent = c.subtitle; el.style.color = c.headerColor; }
+  });
+  ['tsim-t-feed','tsim-c-feed','tsim-m-feed'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.innerHTML = '<div data-ph style="text-align:center;padding:20px;color:var(--text3);font-size:10px">Iniciando...</div>';
+  });
+  xBuildSteps('tsim-', c.steps);
+  tsimDoStep(0);
+}
+
+function tsimDoStep(idx) {
+  var c = getTCASOS(tsimState.caso);
+  var s = c.steps[idx];
+  tsimState.step = idx;
+  xTimer('tsim-timer','tsim-timer-sub',s.dias,s.horas);
+  var statuses = [{id:'tsim-t-status',st:s.t},{id:'tsim-c-status',st:s.c},{id:'tsim-m-status',st:s.m}];
+  statuses.forEach(function(x) {
+    var el = document.getElementById(x.id);
+    if (el) { el.textContent = x.st.status; el.style.background = x.st.color; }
+  });
+  if (s.t.event) xCard('tsim-t-feed', s.t.event, false);
+  if (s.c.event) xCard('tsim-c-feed', s.c.event, true);
+  if (s.m.event) xCard('tsim-m-feed', s.m.event, true);
+  xDots('tsim-', idx, c.steps.length);
+  var lbl = document.getElementById('tsim-step-label');
+  if (lbl) lbl.textContent = 'Paso '+(idx+1)+' de '+c.steps.length;
+  xBtn('tsim-btn-next','tsim-btn-hint', idx>=c.steps.length-1, '#92400E', tsimNext);
+}
+
+function tsimNext() {
+  var c = getTCASOS(tsimState.caso);
+  if (tsimState.step < c.steps.length-1) tsimDoStep(tsimState.step+1);
+}
+
+function tsimReset() {
+  tsimState = {caso:null,step:0};
+  var sel = document.getElementById('tsim-selector');
+  var panel = document.getElementById('tsim-panel');
+  if (sel) sel.style.display = 'grid';
+  if (panel) panel.style.display = 'none';
+}
+
+// ======= MARCA SIM FUNCTIONS =======
+function msimStart(caso) {
+  msimState = {caso:caso, step:0};
+  var c = getMCASOS(caso);
+  document.getElementById('msim-selector').style.display = 'none';
+  document.getElementById('msim-panel').style.display = 'block';
+  var hdr = document.getElementById('msim-header');
+  if (hdr) hdr.style.background = c.headerBg;
+  ['msim-emoji','msim-title','msim-subtitle'].forEach(function(id, i) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    if (i===0) el.textContent = c.emoji;
+    else if (i===1) { el.textContent = c.title; el.style.color = c.headerColor; }
+    else { el.textContent = c.subtitle; el.style.color = c.headerColor; }
+  });
+  ['msim-m-feed','msim-c-feed','msim-t-feed'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.innerHTML = '<div data-ph style="text-align:center;padding:20px;color:var(--text3);font-size:10px">Iniciando...</div>';
+  });
+  xBuildSteps('msim-', c.steps);
+  msimDoStep(0);
+}
+
+function msimDoStep(idx) {
+  var c = getMCASOS(msimState.caso);
+  var s = c.steps[idx];
+  msimState.step = idx;
+  xTimer('msim-timer','msim-timer-sub',s.dias,s.horas);
+  var statuses = [{id:'msim-m-status',st:s.m},{id:'msim-c-status',st:s.c},{id:'msim-t-status',st:s.t}];
+  statuses.forEach(function(x) {
+    var el = document.getElementById(x.id);
+    if (el) { el.textContent = x.st.status; el.style.background = x.st.color; }
+  });
+  if (s.m.event) xCard('msim-m-feed', s.m.event, false);
+  if (s.c.event) xCard('msim-c-feed', s.c.event, true);
+  if (s.t.event) xCard('msim-t-feed', s.t.event, true);
+  xDots('msim-', idx, c.steps.length);
+  var lbl = document.getElementById('msim-step-label');
+  if (lbl) lbl.textContent = 'Paso '+(idx+1)+' de '+c.steps.length;
+  xBtn('msim-btn-next','msim-btn-hint', idx>=c.steps.length-1, '#0A1628', msimNext);
+}
+
+function msimNext() {
+  var c = getMCASOS(msimState.caso);
+  if (msimState.step < c.steps.length-1) msimDoStep(msimState.step+1);
+}
+
+function msimReset() {
+  msimState = {caso:null,step:0};
+  var sel = document.getElementById('msim-selector');
+  var panel = document.getElementById('msim-panel');
+  if (sel) sel.style.display = 'grid';
+  if (panel) panel.style.display = 'none';
+}
+
+// ======= SIM OVERLAY (para el flujo consumidor -> ver resolución) =======
+var sovState = { caso: null, step: 0 };
+
+function sovCard(feedId, ev) {
+  var feed = document.getElementById(feedId);
+  if (!feed) return;
+  var ph = feed.querySelector('[data-sovph]');
+  if (ph) ph.remove();
+  // support both key formats
+  var bg = ev.bg || ev.color || '#F5F7FA';
+  var bdr = ev.bdr || ev.border || '#E5E7EB';
+  var card = document.createElement('div');
+  card.style.cssText = 'border-radius:8px;border:1px solid '+bdr+';background:'+bg+';padding:10px;animation:fadeIn .35s ease';
+  card.innerHTML = '<div style="display:flex;align-items:center;gap:6px;margin-bottom:5px">'
+    +'<span style="font-size:16px">'+ev.icon+'</span>'
+    +'<span style="font-size:11px;font-weight:700;color:#1F2937">'+ev.title+'</span>'
+    +'</div>'
+    +'<div style="font-size:11px;color:#374151;line-height:1.55">'+ev.body+'</div>';
+  feed.appendChild(card);
+  feed.scrollTop = feed.scrollHeight;
+}
+
+function sovSetStatus(id, st) {
+  var el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = st.status;
+  el.style.background = st.color;
+}
+
+function sovBuildSteps(steps) {
+  var row = document.getElementById('sov-steps-row');
+  if (!row) return;
+  row.innerHTML = '';
+  steps.forEach(function(s, i) {
+    var d = document.createElement('div');
+    d.style.cssText = 'display:flex;align-items:center;flex:1';
+    d.innerHTML = '<div id="sovdot'+i+'" style="width:26px;height:26px;border-radius:50%;border:2px solid #E5E7EB;background:#fff;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#9CA3AF;flex-shrink:0;transition:all .25s">'+(i+1)+'</div>'
+      +'<div style="font-size:9px;color:#9CA3AF;margin:0 3px;max-width:70px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+s.label+'</div>'
+      +(i < steps.length-1 ? '<div id="sovline'+i+'" style="flex:1;height:2px;background:#E5E7EB;transition:background .25s"></div>' : '');
+    row.appendChild(d);
+  });
+}
+
+function sovUpdateDots(idx, total) {
+  for (var i = 0; i < total; i++) {
+    var dot = document.getElementById('sovdot'+i);
+    var line = document.getElementById('sovline'+i);
+    if (!dot) continue;
+    if (i < idx) {
+      dot.style.background='#22C55E'; dot.style.borderColor='#22C55E'; dot.style.color='#fff'; dot.textContent='✓';
+      if (line) line.style.background='#22C55E';
+    } else if (i === idx) {
+      dot.style.background='#0052CC'; dot.style.borderColor='#0052CC'; dot.style.color='#fff'; dot.textContent=i+1;
+    } else {
+      dot.style.background='#fff'; dot.style.borderColor='#E5E7EB'; dot.style.color='#9CA3AF'; dot.textContent=i+1;
+      if (line) line.style.background='#E5E7EB';
+    }
+  }
+}
+
+function sovTimer(d, h) {
+  var tel = document.getElementById('sov-timer');
+  var sel = document.getElementById('sov-timer-sub');
+  if (tel) tel.textContent = d === 0 ? 'Día 0' : 'Día ' + d;
+  if (sel) sel.textContent = (d === 0 && h === 0) ? 'Inicio' : (d > 0 ? d + (d===1?' día ':' días ') + (h>0?h+'h':'') : h + ' hora' + (h===1?'':'s'));
+}
+
+function simOverlayStart(caso) {
+  sovState = { caso: caso, step: 0 };
+  var c = CASOS[caso];
+  if (!c) { console.error('CASOS['+caso+'] not found'); return; }
+
+  // Set header
+  var hdr = document.getElementById('sov-header');
+  if (hdr) hdr.style.background = c.headerBg;
+  var emo = document.getElementById('sov-emoji');
+  if (emo) emo.textContent = c.emoji;
+  var tit = document.getElementById('sov-title');
+  if (tit) { tit.textContent = c.title; tit.style.color = c.headerColor; }
+  var sub = document.getElementById('sov-subtitle');
+  if (sub) { sub.textContent = c.subtitle; sub.style.color = c.headerColor; }
+
+  // Clear feeds
+  ['sov-c-feed','sov-t-feed','sov-m-feed'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.innerHTML = '<div data-sovph style="text-align:center;padding:30px 10px;color:#9CA3AF;font-size:11px">Cargando...</div>';
+  });
+
+  sovBuildSteps(c.steps);
+  sovDoStep(0);
+}
+
+function sovDoStep(idx) {
+  var c = CASOS[sovState.caso];
+  if (!c) return;
+  var s = c.steps[idx];
+  sovState.step = idx;
+
+  sovTimer(s.dias, s.horas);
+  sovSetStatus('sov-c-status', s.c);
+  sovSetStatus('sov-t-status', s.t);
+  sovSetStatus('sov-m-status', s.m);
+
+  if (s.c.event) sovCard('sov-c-feed', s.c.event);
+  if (s.t.event) sovCard('sov-t-feed', s.t.event);
+  if (s.m.event) sovCard('sov-m-feed', s.m.event);
+
+  sovUpdateDots(idx, c.steps.length);
+
+  var lbl = document.getElementById('sov-step-lbl');
+  if (lbl) lbl.textContent = 'Paso '+(idx+1)+' de '+c.steps.length;
+
+  var btn = document.getElementById('sov-btn-next');
+  var hint = document.getElementById('sov-btn-hint');
+  if (idx >= c.steps.length - 1) {
+    if (btn) { btn.textContent = '✓ Caso resuelto'; btn.style.background = '#22C55E'; btn.onclick = null; }
+    if (hint) hint.textContent = 'El caso ha concluido. Cierra esta ventana para volver.';
+  } else {
+    if (btn) { btn.innerHTML = '▶ Avanzar al siguiente paso'; btn.style.background = '#0052CC'; btn.onclick = sovNext; }
+    if (hint) hint.textContent = 'Haz clic para ver qué pasa a continuación';
+  }
+}
+
+function sovNext() {
+  var c = CASOS[sovState.caso];
+  if (c && sovState.step < c.steps.length - 1) {
+    sovDoStep(sovState.step + 1);
+  }
+}
+
 </script>
+
+<!-- SIM OVERLAY -->
+<div id="sim-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:500;align-items:flex-start;justify-content:center;overflow-y:auto;padding:20px">
+  <div style="background:#fff;border-radius:16px;width:100%;max-width:960px;margin:auto;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,.4)">
+
+    <!-- OVERLAY HEADER -->
+    <div id="sov-header" style="padding:16px 20px;display:flex;align-items:center;justify-content:space-between">
+      <div style="display:flex;align-items:center;gap:12px">
+        <span id="sov-emoji" style="font-size:28px"></span>
+        <div>
+          <div id="sov-title" style="font-size:15px;font-weight:800;color:#1F2937"></div>
+          <div id="sov-subtitle" style="font-size:11px;color:#6B7280;margin-top:2px"></div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="background:rgba(255,255,255,.9);border:1px solid #E5E7EB;border-radius:10px;padding:6px 14px;text-align:center">
+          <div style="font-size:9px;color:#6B7280;font-weight:600">TIEMPO</div>
+          <div id="sov-timer" style="font-size:20px;font-weight:800;font-family:monospace;color:#1F2937">Día 0</div>
+          <div id="sov-timer-sub" style="font-size:9px;color:#6B7280">Inicio</div>
+        </div>
+        <button onclick="cerrarSimOverlay()" style="padding:8px 16px;border-radius:8px;background:#1F2937;color:#fff;font-size:12px;font-weight:700;border:none;cursor:pointer">✕ Cerrar</button>
+      </div>
+    </div>
+
+    <!-- TRES PANELES -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;border-top:1px solid #E5E7EB">
+
+      <!-- CONSUMIDOR -->
+      <div style="border-right:1px solid #E5E7EB">
+        <div style="padding:10px 14px;background:#0052CC;display:flex;align-items:center;gap:8px">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" style="width:13px;flex-shrink:0"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+          <span style="font-size:11px;font-weight:700;color:#fff">CONSUMIDOR</span>
+          <span id="sov-c-status" style="margin-left:auto;font-size:9px;font-weight:700;padding:2px 7px;border-radius:10px;background:rgba(255,255,255,.2);color:#fff">–</span>
+        </div>
+        <div id="sov-c-feed" style="padding:12px;min-height:280px;max-height:350px;overflow-y:auto;background:#fff;display:flex;flex-direction:column;gap:8px">
+          <div style="text-align:center;padding:40px 10px;color:#9CA3AF;font-size:11px">Iniciando...</div>
+        </div>
+      </div>
+
+      <!-- TALLER -->
+      <div style="border-right:1px solid #E5E7EB">
+        <div style="padding:10px 14px;background:#92400E;display:flex;align-items:center;gap:8px">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" style="width:13px;flex-shrink:0"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+          <span style="font-size:11px;font-weight:700;color:#fff">TALLER</span>
+          <span id="sov-t-status" style="margin-left:auto;font-size:9px;font-weight:700;padding:2px 7px;border-radius:10px;background:rgba(255,255,255,.2);color:#fff">–</span>
+        </div>
+        <div id="sov-t-feed" style="padding:12px;min-height:280px;max-height:350px;overflow-y:auto;background:#fff;display:flex;flex-direction:column;gap:8px">
+          <div style="text-align:center;padding:40px 10px;color:#9CA3AF;font-size:11px">Iniciando...</div>
+        </div>
+      </div>
+
+      <!-- MARCA -->
+      <div>
+        <div style="padding:10px 14px;background:#0A1628;display:flex;align-items:center;gap:8px">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" style="width:13px;flex-shrink:0"><path d="M3 21h18M3 7v14M21 7v14M9 21v-6h6v6M3 7l9-4 9 4"/></svg>
+          <span style="font-size:11px;font-weight:700;color:#fff">MARCA</span>
+          <span id="sov-m-status" style="margin-left:auto;font-size:9px;font-weight:700;padding:2px 7px;border-radius:10px;background:rgba(255,255,255,.1);color:#fff">–</span>
+        </div>
+        <div id="sov-m-feed" style="padding:12px;min-height:280px;max-height:350px;overflow-y:auto;background:#fff;display:flex;flex-direction:column;gap:8px">
+          <div style="text-align:center;padding:40px 10px;color:#9CA3AF;font-size:11px">Iniciando...</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- PROGRESO -->
+    <div style="padding:16px 20px;border-top:1px solid #E5E7EB;background:#F9FAFB">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <span style="font-size:12px;font-weight:700;color:#1F2937">Progreso del trámite</span>
+        <span id="sov-step-lbl" style="font-size:11px;color:#6B7280">Paso 1</span>
+      </div>
+      <div id="sov-steps-row" style="display:flex;align-items:center;margin-bottom:14px"></div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <button id="sov-btn-next" onclick="sovNext()" style="padding:9px 22px;border-radius:8px;background:#0052CC;color:#fff;font-size:13px;font-weight:700;border:none;cursor:pointer">▶ Avanzar al siguiente paso</button>
+        <span id="sov-btn-hint" style="font-size:11px;color:#6B7280">Haz clic para ver qué pasa a continuación</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
 </body>
 </html>
+
