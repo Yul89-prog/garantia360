@@ -242,6 +242,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .sign-box{border:2px dashed var(--border);border-radius:10px;height:100px;display:flex;align-items:center;justify-content:center;cursor:pointer;background:var(--gray);transition:all .2s}
 .sign-box:hover{border-color:var(--blue);background:var(--blue-l)}
 .sign-box.signed{border-color:var(--green);background:var(--green-l);border-style:solid}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.sim-case-btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.08)}
 .stars{display:flex;gap:7px;margin:10px 0}
 .star{font-size:24px;cursor:pointer;color:#D1D5DB;transition:color .12s}
 .star.on{color:var(--amber)}
@@ -414,6 +416,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
         <div class="slbl">Gestión</div>
         <div class="ni" data-page="c-vehiculos" onclick="navC('c-vehiculos',this)"><svg viewBox="0 0 24 24"><path d="M5 17H3a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v9a2 2 0 0 1-2 2h-2"/><circle cx="7.5" cy="17.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>Mis Vehículos</div>
         <div class="ni" data-page="c-historial" onclick="navC('c-historial',this)"><svg viewBox="0 0 24 24"><path d="M3 3h18v18H3z"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>Historial</div>
+        <div class="slbl">Simulador</div>
+        <div class="ni" data-page="c-simulador" onclick="navC('c-simulador',this)" style="background:linear-gradient(90deg,#EBF2FF,transparent);font-weight:700"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>Simulador de casos <span class="nb" style="background:var(--purple)">★</span></div>
         <div class="ni" data-page="c-perfil" onclick="navC('c-perfil',this)"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Mi Perfil</div>
       </nav>
       <div class="sf">
@@ -735,6 +739,124 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
                 <div class="krow"><span class="kn">NPS promedio</span><span class="kv">4.3 ⭐</span></div>
               </div>
             </div>
+          </div>
+
+        <!-- SIMULADOR DE CASOS -->
+        <div class="page" id="pg-c-simulador">
+          <div class="ph">
+            <div class="pt">Simulador de casos — Vista en tiempo real</div>
+            <div class="ps">Selecciona un caso y observa qué pasa en los tres actores simultáneamente</div>
+          </div>
+
+          <!-- SELECTOR DE CASO -->
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px" id="sim-selector">
+            <div class="sim-case-btn" onclick="simStart('verde')" style="cursor:pointer;border-radius:12px;border:2px solid #BBF7D0;background:#fff;padding:16px;transition:all .2s;text-align:center">
+              <div style="font-size:28px;margin-bottom:8px">🟢</div>
+              <div style="font-size:13px;font-weight:700;color:#15803D;margin-bottom:4px">Caso BAJO</div>
+              <div style="font-size:11px;color:var(--text2);margin-bottom:10px">Consulta de cobertura — Chatbot FAQ</div>
+              <div style="font-size:10px;color:#15803D;font-weight:600">⏱ Resolución: Inmediata</div>
+              <div style="margin-top:8px;font-size:11px;color:var(--text2)">Sin intervención humana</div>
+              <div style="margin-top:10px;padding:6px 12px;background:var(--green);color:#fff;border-radius:7px;font-size:11px;font-weight:700">Simular este caso →</div>
+            </div>
+            <div class="sim-case-btn" onclick="simStart('amarillo')" style="cursor:pointer;border-radius:12px;border:2px solid #FDE68A;background:#fff;padding:16px;transition:all .2s;text-align:center">
+              <div style="font-size:28px;margin-bottom:8px">🟡</div>
+              <div style="font-size:13px;font-weight:700;color:#92400E;margin-bottom:4px">Caso MEDIO</div>
+              <div style="font-size:11px;color:var(--text2);margin-bottom:10px">Falla de A/C — Negociación automática</div>
+              <div style="font-size:10px;color:#92400E;font-weight:600">⏱ Resolución: 5 días hábiles</div>
+              <div style="margin-top:8px;font-size:11px;color:var(--text2)">Negociación automática por IA</div>
+              <div style="margin-top:10px;padding:6px 12px;background:var(--amber);color:#fff;border-radius:7px;font-size:11px;font-weight:700">Simular este caso →</div>
+            </div>
+            <div class="sim-case-btn" onclick="simStart('rojo')" style="cursor:pointer;border-radius:12px;border:2px solid #FECACA;background:#fff;padding:16px;transition:all .2s;text-align:center">
+              <div style="font-size:28px;margin-bottom:8px">🔴</div>
+              <div style="font-size:13px;font-weight:700;color:#B91C1C;margin-bottom:4px">Caso CRÍTICO</div>
+              <div style="font-size:11px;color:var(--text2);margin-bottom:10px">Falla de frenos — Humano directo</div>
+              <div style="font-size:10px;color:#B91C1C;font-weight:600">⏱ Resolución: Inmediata — Humano</div>
+              <div style="margin-top:8px;font-size:11px;color:var(--text2)">Escala directo a jurídico y gerencia</div>
+              <div style="margin-top:10px;padding:6px 12px;background:var(--red);color:#fff;border-radius:7px;font-size:11px;font-weight:700">Simular este caso →</div>
+            </div>
+          </div>
+
+          <!-- PANEL DE SIMULACIÓN (oculto hasta que se seleccione un caso) -->
+          <div id="sim-panel" style="display:none">
+
+            <!-- HEADER DEL CASO -->
+            <div id="sim-header" style="border-radius:12px;padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between">
+              <div style="display:flex;align-items:center;gap:12px">
+                <span id="sim-emoji" style="font-size:28px"></span>
+                <div>
+                  <div id="sim-title" style="font-size:15px;font-weight:800"></div>
+                  <div id="sim-subtitle" style="font-size:11px;margin-top:2px"></div>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:12px">
+                <!-- CONTADOR DE DÍAS -->
+                <div style="background:rgba(255,255,255,.9);border-radius:10px;padding:8px 16px;text-align:center;min-width:90px">
+                  <div style="font-size:10px;font-weight:600;color:var(--text2);margin-bottom:2px">TIEMPO TRANSCURRIDO</div>
+                  <div id="sim-timer" style="font-size:22px;font-weight:800;font-family:monospace;color:var(--text)">Día 0</div>
+                  <div id="sim-timer-sub" style="font-size:9px;color:var(--text2)">0 horas</div>
+                </div>
+                <button onclick="simReset()" style="padding:6px 12px;border-radius:7px;border:1px solid rgba(255,255,255,.5);background:rgba(255,255,255,.2);color:#fff;font-size:11px;font-weight:600;cursor:pointer">↩ Cambiar caso</button>
+              </div>
+            </div>
+
+            <!-- TRES PANELES SIMULTÁNEOS -->
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:14px">
+
+              <!-- CONSUMIDOR -->
+              <div style="border-radius:10px;border:1.5px solid var(--border);overflow:hidden">
+                <div style="padding:10px 12px;background:var(--blue);display:flex;align-items:center;gap:8px">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" style="width:14px;flex-shrink:0"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+                  <span style="font-size:11px;font-weight:700;color:#fff">CONSUMIDOR</span>
+                  <span id="sim-c-status" style="margin-left:auto;font-size:9px;font-weight:700;padding:2px 7px;border-radius:10px;background:rgba(255,255,255,.2);color:#fff">Esperando...</span>
+                </div>
+                <div id="sim-c-feed" style="padding:10px;min-height:320px;background:#fff;overflow-y:auto;display:flex;flex-direction:column;gap:7px">
+                  <div style="text-align:center;padding:30px 10px;color:var(--text3);font-size:11px">Selecciona un caso para comenzar la simulación</div>
+                </div>
+              </div>
+
+              <!-- TALLER -->
+              <div style="border-radius:10px;border:1.5px solid var(--border);overflow:hidden">
+                <div style="padding:10px 12px;background:#92400E;display:flex;align-items:center;gap:8px">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" style="width:14px;flex-shrink:0"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+                  <span style="font-size:11px;font-weight:700;color:#fff">TALLER / CONCESIONARIO</span>
+                  <span id="sim-t-status" style="margin-left:auto;font-size:9px;font-weight:700;padding:2px 7px;border-radius:10px;background:rgba(255,255,255,.2);color:#fff">En espera</span>
+                </div>
+                <div id="sim-t-feed" style="padding:10px;min-height:320px;background:#fff;overflow-y:auto;display:flex;flex-direction:column;gap:7px">
+                  <div style="text-align:center;padding:30px 10px;color:var(--text3);font-size:11px">Sin actividad aún</div>
+                </div>
+              </div>
+
+              <!-- MARCA -->
+              <div style="border-radius:10px;border:1.5px solid var(--border);overflow:hidden">
+                <div style="padding:10px 12px;background:#0A1628;display:flex;align-items:center;gap:8px">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" style="width:14px;flex-shrink:0"><path d="M3 21h18M3 7v14M21 7v14M9 21v-6h6v6M3 7l9-4 9 4"/></svg>
+                  <span style="font-size:11px;font-weight:700;color:#fff">MARCA / FABRICANTE</span>
+                  <span id="sim-m-status" style="margin-left:auto;font-size:9px;font-weight:700;padding:2px 7px;border-radius:10px;background:rgba(255,255,255,.1);color:#fff">En espera</span>
+                </div>
+                <div id="sim-m-feed" style="padding:10px;min-height:320px;background:#fff;overflow-y:auto;display:flex;flex-direction:column;gap:7px">
+                  <div style="text-align:center;padding:30px 10px;color:var(--text3);font-size:11px">Sin actividad aún</div>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- BARRA DE PROGRESO DEL FLUJO -->
+            <div class="card card-p" id="sim-progress-card">
+              <div style="font-size:12px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between">
+                <span>Progreso del trámite</span>
+                <span id="sim-step-label" style="font-size:11px;color:var(--text2)">Paso 1 de 5</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:0" id="sim-steps-row"></div>
+              <!-- BOTÓN AVANZAR -->
+              <div style="margin-top:14px;display:flex;align-items:center;gap:10px">
+                <button id="sim-btn-next" onclick="simNext()" style="padding:8px 20px;border-radius:8px;background:var(--blue);color:#fff;font-size:12px;font-weight:700;border:none;cursor:pointer;display:flex;align-items:center;gap:6px">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" style="width:13px"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                  Avanzar al siguiente paso
+                </button>
+                <span id="sim-btn-hint" style="font-size:11px;color:var(--text2)">Haz clic para ver qué pasa a continuación</span>
+              </div>
+            </div>
+
           </div>
         </div>
 
@@ -1519,6 +1641,343 @@ function rateC(n){
   document.querySelectorAll('.star').forEach(function(s,i){s.classList.toggle('on',i<n)});
   showToast('Calificación de '+n+' ⭐ registrada','suc');
 }
+
+
+// ======= SIMULATOR =======
+var simState = {
+  caso: null,
+  step: 0,
+  timer: null,
+  dias: 0,
+  horas: 0
+};
+
+var CASOS = {
+  verde: {
+    emoji: '🟢',
+    title: 'Caso BAJO — Consulta de cobertura',
+    subtitle: 'Dunia Rodríguez pregunta si su revisión preventiva está cubierta por garantía',
+    headerBg: 'linear-gradient(135deg,#DCFCE7,#BBF7D0)',
+    headerColor: '#15803D',
+    maxDias: 0,
+    steps: [
+      {
+        label: 'Solicitud enviada', dias: 0, horas: 0,
+        c: { status: 'Enviando...', color: '#0052CC',
+          event: { icon: '📱', color: '#EBF2FF', border: '#BFDBFE', title: 'Solicitud enviada', body: 'Dunia envió una consulta: "¿Está cubierto el costo de la revisión de los 10.000 km en mi garantía?" desde su celular a las 10:32 AM.' }
+        },
+        t: { status: 'Sin acción', color: '#6B7280',
+          event: { icon: '⚙️', color: '#F5F7FA', border: '#E5E7EB', title: 'Caso enrutado automáticamente', body: 'El sistema clasificó la solicitud como BAJO riesgo. No se requiere intervención del taller. El Chatbot FAQ responderá directamente.' }
+        },
+        m: { status: 'Sin acción', color: '#6B7280',
+          event: { icon: '📊', color: '#F5F7FA', border: '#E5E7EB', title: 'Caso registrado en el sistema', body: 'La solicitud quedó registrada en el dashboard de la marca como auto-resolución. No requiere aprobación.' }
+        }
+      },
+      {
+        label: 'IA analiza VIN', dias: 0, horas: 0,
+        c: { status: 'En proceso', color: '#F59E0B',
+          event: { icon: '🔍', color: '#FEF3C7', border: '#FDE68A', title: 'Sistema validando garantía', body: 'La plataforma conectó con la base de datos de Nissan. VIN 3N1AB7AP9PY123456 verificado: vehículo en garantía hasta Marzo 2026. Km actual: 11,400 — dentro del límite.' }
+        },
+        t: { status: 'Sin acción', color: '#6B7280',
+          event: null
+        },
+        m: { status: 'Sin acción', color: '#6B7280',
+          event: null
+        }
+      },
+      {
+        label: 'Chatbot responde', dias: 0, horas: 0,
+        c: { status: '¡Resuelto!', color: '#15803D',
+          event: { icon: '🤖', color: '#DCFCE7', border: '#BBF7D0', title: 'Respuesta automática enviada', body: 'GARANTÍA360 respondió: "Hola Dunia, según su contrato de garantía (Cláusula 4.2), las revisiones preventivas programadas en la red autorizada SÍ están cubiertas durante los primeros 3 años o 36,000 km. Su revisión de 10,000 km tiene costo $0 en Nissan Satélite."' }
+        },
+        t: { status: 'Sin acción', color: '#6B7280',
+          event: { icon: '📋', color: '#F5F7FA', border: '#E5E7EB', title: 'Confirmación de cobertura', body: 'El taller recibió notificación automática: "Cliente Dunia Rodríguez — revisión 10,000 km confirmada como cubierta por garantía. No cobrar al cliente."' }
+        },
+        m: { status: 'Auto-cerrado', color: '#15803D',
+          event: { icon: '✅', color: '#DCFCE7', border: '#BBF7D0', title: 'Caso cerrado automáticamente', body: 'El sistema registró el cierre. Tipo: Auto-resolución FAQ. Tiempo total: 45 segundos. NPS enviado a cliente.' }
+        }
+      },
+      {
+        label: 'Caso cerrado', dias: 0, horas: 0,
+        c: { status: 'Caso cerrado ✓', color: '#15803D',
+          event: { icon: '⭐', color: '#EBF2FF', border: '#BFDBFE', title: 'Encuesta de satisfacción', body: 'Dunia calificó la atención con 5 estrellas y comentó: "No tuve que esperar nada. Me respondieron en segundos y el taller ya sabe que no me puede cobrar. Excelente."' }
+        },
+        t: { status: 'Completo', color: '#15803D',
+          event: null
+        },
+        m: { status: 'Archivado', color: '#6B7280',
+          event: { icon: '📈', color: '#DCFCE7', border: '#BBF7D0', title: 'Métricas actualizadas', body: 'Dashboard actualizado: +1 caso auto-resuelto. Tiempo promedio: 45 seg. Satisfacción: 5/5 estrellas. Costo para la marca: $0.' }
+        }
+      }
+    ]
+  },
+
+  amarillo: {
+    emoji: '🟡',
+    title: 'Caso MEDIO — Falla de Aire Acondicionado',
+    subtitle: 'Carlos Mendoza reporta que el A/C de su Nissan Sentra 2023 deja de enfriar después de 10 minutos',
+    headerBg: 'linear-gradient(135deg,#FEF3C7,#FDE68A)',
+    headerColor: '#92400E',
+    maxDias: 5,
+    steps: [
+      {
+        label: 'Solicitud enviada', dias: 0, horas: 0,
+        c: { status: 'Enviando...', color: '#0052CC',
+          event: { icon: '📱', color: '#EBF2FF', border: '#BFDBFE', title: 'Solicitud #GR-2441 creada', body: 'Carlos envió: "El A/C de mi Sentra 2023 deja de enfriar después de 10 minutos. Ya entró 2 veces al taller y sigue igual." Adjuntó 3 fotos y la orden de servicio anterior.' }
+        },
+        t: { status: 'Notificado', color: '#F59E0B',
+          event: { icon: '🔔', color: '#FEF3C7', border: '#FDE68A', title: 'Nuevo caso asignado — SLA: 48h', body: 'El técnico Rodrigo Sánchez recibió notificación: "Caso #GR-2441 asignado. A/C Sentra 2023. Cliente: Carlos Mendoza. Historial: 2 ingresos previos mismo problema. Debe emitir diagnóstico antes de las 18:00 del día 2."' }
+        },
+        m: { status: 'Registrado', color: '#6B7280',
+          event: { icon: '📊', color: '#F5F7FA', border: '#E5E7EB', title: 'Caso MEDIO registrado', body: 'Sistema detectó nivel de riesgo MEDIO. Canal: Negociación automática. Caso visible en dashboard de Nissan México. Sin aprobación requerida aún.' }
+        }
+      },
+      {
+        label: 'IA clasifica', dias: 0, horas: 1,
+        c: { status: 'En revisión', color: '#F59E0B',
+          event: { icon: '🤖', color: '#FEF3C7', border: '#FDE68A', title: 'Motor de negociación activado', body: 'La IA analizó el caso: VIN verificado en garantía ✓. Historial: 2 ingresos anteriores por A/C ✓. Clasificación: Falla recurrente de confort. La IA preparará propuesta de compensación automática.' }
+        },
+        t: { status: 'Diagnóstico pendiente', color: '#F59E0B',
+          event: { icon: '⏱', color: '#FEF3C7', border: '#FDE68A', title: 'SLA activo — 47 horas restantes', body: 'El sistema envió recordatorio al técnico: "Tienes 47 horas para emitir el diagnóstico del caso #GR-2441. Si no respondes, el caso escala automáticamente al supervisor."' }
+        },
+        m: { status: 'Monitoreando', color: '#6B7280',
+          event: null
+        }
+      },
+      {
+        label: 'Diagnóstico emitido', dias: 1, horas: 6,
+        c: { status: 'Diagnóstico listo', color: '#F59E0B',
+          event: { icon: '🔧', color: '#FEF3C7', border: '#FDE68A', title: 'Diagnóstico recibido del taller', body: 'El técnico Rodrigo Sánchez emitió: "Falla en compresor de A/C por desgaste prematuro. Causa: defecto de fabricación en válvula de expansión. Recomendación: reemplazo completo del sistema bajo garantía."' }
+        },
+        t: { status: 'Diagnóstico enviado ✓', color: '#15803D',
+          event: { icon: '✅', color: '#DCFCE7', border: '#BBF7D0', title: 'Diagnóstico registrado — SLA cumplido', body: 'Rodrigo completó el diagnóstico en 30 horas (SLA: 48h). Sistema registró cumplimiento. Cotización automática generada: Compresor A/C $4,200 + Válvula $1,800 + MO $1,200 = $7,200 total. Cobertura garantía: 100%.' }
+        },
+        m: { status: 'Revisando', color: '#F59E0B',
+          event: { icon: '📋', color: '#FEF3C7', border: '#FDE68A', title: 'Cotización recibida para aprobación', body: 'Nissan México recibió cotización #GR-2441: $7,200 — 100% cobertura garantía. Historial del VIN muestra 2 ingresos previos misma falla. Sistema recomienda aprobación inmediata. SLA respuesta: 4 horas.' }
+        }
+      },
+      {
+        label: 'Marca aprueba', dias: 2, horas: 0,
+        c: { status: 'Aprobado ✓', color: '#15803D',
+          event: { icon: '🎉', color: '#DCFCE7', border: '#BBF7D0', title: 'Garantía aprobada por Nissan México', body: '¡Buenas noticias! Nissan México aprobó la cobertura total. Notificación enviada a Carlos: "Su garantía cubre el 100% de la reparación. Costo para usted: $0. El taller iniciará la reparación mañana. Tiempo estimado: 2 días."' }
+        },
+        t: { status: 'Reparación autorizada', color: '#15803D',
+          event: { icon: '🔑', color: '#DCFCE7', border: '#BBF7D0', title: 'Autorización de reparación recibida', body: 'Nissan México autorizó la reparación. Orden de trabajo generada automáticamente. Piezas disponibles en inventario. El taller puede iniciar hoy. Reembolso de $7,200 procesado por la marca.' }
+        },
+        m: { status: 'Aprobado en 2h', color: '#15803D',
+          event: { icon: '✅', color: '#DCFCE7', border: '#BBF7D0', title: 'Aprobación emitida — SLA cumplido', body: 'Gerente de garantías aprobó en 2 horas (SLA: 4h). Monto: $7,200. Cobertura: 100%. El sistema notificó a taller y cliente. Caso avanza a reparación.' }
+        }
+      },
+      {
+        label: 'Firma y cierre', dias: 4, horas: 0,
+        c: { status: 'Caso cerrado ✓', color: '#15803D',
+          event: { icon: '✍️', color: '#DCFCE7', border: '#BBF7D0', title: 'Acuerdo firmado digitalmente', body: 'Carlos firmó el acuerdo de resolución. Expediente PDF certificado (NOM-151) generado y enviado por email. La reparación fue completada. Carlos calificó el proceso con 5 estrellas. "Nunca pensé que sería tan rápido."' }
+        },
+        t: { status: 'Caso cerrado', color: '#15803D',
+          event: { icon: '📁', color: '#DCFCE7', border: '#BBF7D0', title: 'Caso cerrado — rendimiento actualizado', body: 'Caso #GR-2441 cerrado. Tiempo total: 4 días (límite: 5 días hábiles). NPS del técnico: 5/5. Caso registrado en historial del vehículo VIN 3N1AB7AP9PY123456.' }
+        },
+        m: { status: 'Archivado', color: '#15803D',
+          event: { icon: '📈', color: '#DCFCE7', border: '#BBF7D0', title: 'Métricas actualizadas — Caso exitoso', body: 'Caso cerrado en 4 días (vs 8-14 meses en juzgado). Costo legal evitado: estimado $45,000 MXN. Satisfacción cliente: 5/5. La marca protegió su reputación y fidelizó al cliente.' }
+        }
+      }
+    ]
+  },
+
+  rojo: {
+    emoji: '🔴',
+    title: 'Caso CRÍTICO — Falla de Frenos',
+    subtitle: 'Ana Gutiérrez reporta que los frenos de su Nissan Kicks 2023 fallan a alta velocidad — riesgo de vida',
+    headerBg: 'linear-gradient(135deg,#FEE2E2,#FECACA)',
+    headerColor: '#B91C1C',
+    maxDias: 1,
+    steps: [
+      {
+        label: 'Alerta crítica', dias: 0, horas: 0,
+        c: { status: '🚨 URGENTE', color: '#B91C1C',
+          event: { icon: '🚨', color: '#FEE2E2', border: '#FECACA', title: 'Solicitud CRÍTICA recibida', body: 'Ana Gutiérrez envió: "Los frenos de mi Kicks 2023 se ponen duros y no responden bien a 80 km/h. Ya pasó 3 veces esta semana. Tengo miedo de que sea un accidente." El sistema detectó palabras clave: FRENOS + FALLA + REPETITIVO.' }
+        },
+        t: { status: '🚨 Alerta inmediata', color: '#B91C1C',
+          event: { icon: '🔔', color: '#FEE2E2', border: '#FECACA', title: 'ALERTA CRÍTICA — Intervención inmediata', body: 'EL SISTEMA OMITIÓ LA NEGOCIACIÓN AUTOMÁTICA. Notificación de emergencia enviada al gerente del taller: "Caso CRÍTICO #GR-2489. Falla de frenos. Vehículo NO debe circular. Organizar grúa y vehículo sustituto de inmediato para Ana Gutiérrez."' }
+        },
+        m: { status: '🚨 Notificación jurídica', color: '#B91C1C',
+          event: { icon: '⚖️', color: '#FEE2E2', border: '#FECACA', title: 'Área jurídica y gerencia notificadas', body: 'Nissan México recibió alerta crítica automática a las 10:47 AM: "Falla de seguridad activa — frenos — Kicks 2023. VIN: 3N1CP5CU9PL234567. 3 episodios en 7 días. Posible responsabilidad civil. Acción inmediata requerida."' }
+        }
+      },
+      {
+        label: 'Protocolo de emergencia', dias: 0, horas: 1,
+        c: { status: 'Protocolo activo', color: '#B91C1C',
+          event: { icon: '🚛', color: '#FEE2E2', border: '#FECACA', title: 'Grúa y vehículo sustituto enviados', body: 'Ana recibió mensaje: "Su caso fue marcado como CRÍTICO. Por su seguridad, NO conduzca el vehículo. Hemos enviado una grúa a su ubicación (ETA: 25 min) y un Nissan Kicks 2024 de cortesía que llegará con el remolque. Todo sin costo."' }
+        },
+        t: { status: 'Grúa despachada', color: '#B91C1C',
+          event: { icon: '🔧', color: '#FEE2E2', border: '#FECACA', title: 'Técnico especialista asignado', body: 'El gerente del taller asignó al técnico más senior para revisión urgente del sistema de frenos. Instrucción: "Prioridad máxima. Diagnóstico completo en 4 horas. Documentar cada hallazgo con fotos. Posible defecto de lote."' }
+        },
+        m: { status: 'Investigando lote', color: '#B91C1C',
+          event: { icon: '🔍', color: '#FEE2E2', border: '#FECACA', title: 'Investigación de lote iniciada', body: 'El área de calidad de Nissan México lanzó búsqueda en la base de datos: ¿Hay más Kicks 2023 con reportes de frenos en las últimas 4 semanas? Sistema encontró 4 casos similares en 3 talleres distintos.' }
+        }
+      },
+      {
+        label: 'Diagnóstico técnico', dias: 0, horas: 5,
+        c: { status: 'Diagnóstico listo', color: '#B91C1C',
+          event: { icon: '📋', color: '#FEE2E2', border: '#FECACA', title: 'Resultado del diagnóstico', body: 'El técnico confirmó: "Falla en el actuador del ABS y válvula del servofreno. Defecto de fabricación — lote producción Ene-Feb 2023. Vehículo NO apto para circular. Reparación estimada: 2 días. El vehículo sustituto queda con Ana hasta la entrega."' }
+        },
+        t: { status: 'Diagnóstico completado', color: '#B91C1C',
+          event: { icon: '⚠️', color: '#FEE2E2', border: '#FECACA', title: 'Alerta de defecto de lote confirmada', body: 'El técnico reportó a la marca: "Defecto confirmado en lote ENE-FEB 2023. Actuador ABS defectuoso. Revisé 2 Kicks más del mismo lote en nuestro inventario — misma falla latente. Recomiendo campaña de servicio urgente."' }
+        },
+        m: { status: 'Campaña en evaluación', color: '#B91C1C',
+          event: { icon: '🚗', color: '#FEE2E2', border: '#FECACA', title: '5 casos confirmados — Campaña de recall iniciada', body: 'Nissan México confirmó: 5 vehículos afectados del mismo lote. Se activó protocolo de campaña de servicio CS-2025-09. Todos los propietarios de Kicks ENE-FEB 2023 serán notificados. Estimado: 847 vehículos a revisar en la red nacional.' }
+        }
+      },
+      {
+        label: 'Resolución y recall', dias: 1, horas: 0,
+        c: { status: 'Resuelto + Recall ✓', color: '#15803D',
+          event: { icon: '✅', color: '#DCFCE7', border: '#BBF7D0', title: 'Vehículo reparado — Sin costo', body: 'Ana recuperó su Kicks con los frenos reparados al 100%. Nissan México cubrió: reparación $0, grúa $0, vehículo sustituto 2 días $0. Ana firmó el acuerdo y recibió garantía extendida de 2 años en el sistema de frenos. Calificación: 5/5.' }
+        },
+        t: { status: 'Caso cerrado', color: '#15803D',
+          event: { icon: '📁', color: '#DCFCE7', border: '#BBF7D0', title: 'Reparación completada — Caso cerrado', body: 'El taller entregó el vehículo reparado en menos de 24 horas. Nissan México reembolsó $12,400 al taller (piezas + MO). El técnico documentó el caso para el expediente de la campaña de recall.' }
+        },
+        m: { status: 'Recall activo — 847 vehículos', color: '#B91C1C',
+          event: { icon: '📢', color: '#FEE2E2', border: '#FECACA', title: 'Campaña CS-2025-09 lanzada', body: 'Nissan México notificó a los 847 propietarios de Kicks ENE-FEB 2023. La queja de Ana evitó potencialmente cientos de accidentes. La plataforma ODR permitió detectar el defecto de lote en menos de 24 horas, vs semanas o meses en el proceso tradicional.' }
+        }
+      }
+    ]
+  }
+};
+
+function simStart(caso) {
+  simState.caso = caso;
+  simState.step = 0;
+  simState.dias = 0;
+  simState.horas = 0;
+
+  var c = CASOS[caso];
+  document.getElementById('sim-selector').style.display = 'none';
+  document.getElementById('sim-panel').style.display = 'block';
+
+  // header
+  var hdr = document.getElementById('sim-header');
+  hdr.style.background = c.headerBg;
+  document.getElementById('sim-emoji').textContent = c.emoji;
+  document.getElementById('sim-title').textContent = c.title;
+  document.getElementById('sim-title').style.color = c.headerColor;
+  document.getElementById('sim-subtitle').textContent = c.subtitle;
+  document.getElementById('sim-subtitle').style.color = c.headerColor;
+
+  // clear feeds
+  document.getElementById('sim-c-feed').innerHTML = '';
+  document.getElementById('sim-t-feed').innerHTML = '';
+  document.getElementById('sim-m-feed').innerHTML = '';
+
+  // build steps row
+  var stepsRow = document.getElementById('sim-steps-row');
+  stepsRow.innerHTML = '';
+  c.steps.forEach(function(s, i) {
+    var dot = document.createElement('div');
+    dot.style.cssText = 'display:flex;align-items:center;flex:1';
+    dot.innerHTML = '<div id="sdot-'+i+'" style="width:28px;height:28px;border-radius:50%;border:2px solid #E5E7EB;background:#fff;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#9CA3AF;flex-shrink:0;transition:all .3s">'+( i+1 )+'</div>'
+      + '<div style="font-size:9px;color:#9CA3AF;margin-left:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:70px" id="slbl-'+i+'">'+s.label+'</div>'
+      + (i < c.steps.length-1 ? '<div id="sline-'+i+'" style="flex:1;height:2px;background:#E5E7EB;margin:0 4px;transition:all .3s"></div>' : '');
+    stepsRow.appendChild(dot);
+  });
+
+  simStep(0);
+}
+
+function simStep(idx) {
+  var c = CASOS[simState.caso];
+  var step = c.steps[idx];
+  simState.step = idx;
+
+  // update timer
+  simState.dias = step.dias;
+  simState.horas = step.horas;
+  updateTimer();
+
+  // update statuses
+  document.getElementById('sim-c-status').textContent = step.c.status;
+  document.getElementById('sim-c-status').style.background = step.c.color;
+  document.getElementById('sim-t-status').textContent = step.t.status;
+  document.getElementById('sim-t-status').style.background = step.t.color;
+  document.getElementById('sim-m-status').textContent = step.m.status;
+  document.getElementById('sim-m-status').style.background = step.m.color;
+
+  // add event cards
+  if (step.c.event) addEventCard('sim-c-feed', step.c.event);
+  if (step.t.event) addEventCard('sim-t-feed', step.t.event);
+  if (step.m.event) addEventCard('sim-m-feed', step.m.event);
+
+  // update step dots
+  c.steps.forEach(function(s, i) {
+    var dot = document.getElementById('sdot-'+i);
+    var lbl = document.getElementById('slbl-'+i);
+    var line = document.getElementById('sline-'+i);
+    if (!dot) return;
+    if (i < idx) {
+      dot.style.background = '#22C55E'; dot.style.borderColor = '#22C55E'; dot.style.color = '#fff'; dot.textContent = '✓';
+      if (lbl) lbl.style.color = '#15803D';
+      if (line) line.style.background = '#22C55E';
+    } else if (i === idx) {
+      dot.style.background = '#0052CC'; dot.style.borderColor = '#0052CC'; dot.style.color = '#fff'; dot.textContent = i+1;
+      if (lbl) lbl.style.color = '#0052CC';
+    } else {
+      dot.style.background = '#fff'; dot.style.borderColor = '#E5E7EB'; dot.style.color = '#9CA3AF'; dot.textContent = i+1;
+      if (lbl) lbl.style.color = '#9CA3AF';
+    }
+  });
+
+  // update label and button
+  document.getElementById('sim-step-label').textContent = 'Paso '+(idx+1)+' de '+c.steps.length;
+
+  var btn = document.getElementById('sim-btn-next');
+  var hint = document.getElementById('sim-btn-hint');
+  if (idx >= c.steps.length - 1) {
+    btn.textContent = '✓ Simulación completada';
+    btn.style.background = '#22C55E';
+    btn.onclick = null;
+    hint.textContent = 'El caso ha sido resuelto. Haz clic en "Cambiar caso" para probar otro.';
+  } else {
+    btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" style="width:13px"><path d="M5 12h14M12 5l7 7-7 7"/></svg> Avanzar al siguiente paso';
+    btn.style.background = '#0052CC';
+    btn.onclick = simNext;
+    hint.textContent = 'Haz clic para ver qué pasa a continuación';
+  }
+}
+
+function simNext() {
+  var c = CASOS[simState.caso];
+  if (simState.step < c.steps.length - 1) {
+    simStep(simState.step + 1);
+  }
+}
+
+function simReset() {
+  if (simState.timer) clearInterval(simState.timer);
+  simState = { caso: null, step: 0, timer: null, dias: 0, horas: 0 };
+  document.getElementById('sim-selector').style.display = 'grid';
+  document.getElementById('sim-panel').style.display = 'none';
+  document.getElementById('sim-timer').textContent = 'Día 0';
+  document.getElementById('sim-timer-sub').textContent = '0 horas';
+}
+
+function updateTimer() {
+  var d = simState.dias;
+  var h = simState.horas;
+  document.getElementById('sim-timer').textContent = d === 0 ? 'Día 0' : 'Día ' + d;
+  document.getElementById('sim-timer-sub').textContent = h === 0 && d === 0 ? 'Inicio' : (d > 0 ? d + (d===1?' día ':' días ') + (h>0 ? h+'h':'') : h + ' hora' + (h===1?'':'s') + ' transcurridas');
+}
+
+function addEventCard(feedId, ev) {
+  var feed = document.getElementById(feedId);
+  // remove placeholder
+  var ph = feed.querySelector('div[style*="text-align:center"]');
+  if (ph) ph.remove();
+  var card = document.createElement('div');
+  card.style.cssText = 'border-radius:8px;border:1px solid '+ev.border+';background:'+ev.color+';padding:10px;animation:fadeIn .4s ease';
+  card.innerHTML = '<div style="display:flex;align-items:center;gap:6px;margin-bottom:5px"><span style="font-size:14px">'+ev.icon+'</span><span style="font-size:11px;font-weight:700;color:#1F2937">'+ev.title+'</span></div>'
+    +'<div style="font-size:10px;color:#374151;line-height:1.5">'+ev.body+'</div>';
+  feed.appendChild(card);
+  feed.scrollTop = feed.scrollHeight;
+}
+
 </script>
 </body>
 </html>
